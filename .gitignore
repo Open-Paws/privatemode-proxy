@@ -1,0 +1,96 @@
+# ===================
+# Secrets & Credentials
+# ===================
+.env
+.env.local
+.env.*.local
+secrets/api_keys.json
+secrets/settings.json
+secrets/privatemode_api_key.txt
+*.secret
+*.credentials
+
+# ===================
+# Runtime Data
+# ===================
+data/
+*.db
+*.sqlite
+
+# ===================
+# TLS Certificates
+# ===================
+certs/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# ===================
+# Python
+# ===================
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+venv/
+.venv/
+ENV/
+env/
+.eggs/
+*.egg-info/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ===================
+# Docker
+# ===================
+.docker/
+
+# ===================
+# IDE & Editors
+# ===================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-workspace
+*.sublime-project
+
+# ===================
+# OS Files
+# ===================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ===================
+# Logs
+# ===================
+*.log
+logs/
+npm-debug.log*
+
+# ===================
+# Build & Temp
+# ===================
+dist/
+build/
+*.tmp
+*.temp
+.cache/
+
+# ===================
+# Claude Code
+# ===================
+.claude/
