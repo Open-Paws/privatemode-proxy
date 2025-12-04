@@ -1037,8 +1037,7 @@ USAGE_BY_KEY_TABLE = """
 <table>
     <thead>
         <tr>
-            <th>Key ID</th>
-            <th>Description</th>
+            <th>Key</th>
             <th style="text-align: right;">Tokens</th>
             <th style="text-align: right;">Requests</th>
             <th style="text-align: right;">Spend (EUR)</th>
@@ -1052,7 +1051,6 @@ USAGE_BY_KEY_TABLE = """
 
 USAGE_BY_KEY_ROW = """
 <tr>
-    <td><code>{key_id}</code></td>
     <td>{description}</td>
     <td style="text-align: right;">{tokens:,}</td>
     <td style="text-align: right;">{requests:,}</td>
@@ -1151,47 +1149,6 @@ SETTINGS_CONTENT = """
     </form>
 </div>
 
-<div class="card">
-    <h3 style="margin-bottom: 1rem;">Server Configuration</h3>
-    <p style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 1rem; line-height: 1.6;">
-        These settings are configured via environment variables.
-        To change them, update the environment and restart the proxy.
-    </p>
-    <div style="background: #0f172a; border-radius: 8px; padding: 1.25rem;">
-        <div style="display: grid; grid-template-columns: auto 1fr; gap: 1rem 1.5rem; font-size: 0.875rem;">
-            <span style="color: #64748b;">Upstream URL</span>
-            <span style="color: #e2e8f0; font-family: monospace;">{upstream_url}</span>
-            <span style="color: #64748b;">Server Port</span>
-            <span style="color: #e2e8f0; font-family: monospace;">{port}</span>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <h3 style="margin-bottom: 1rem;">How to Update the Privatemode API Key</h3>
-    <p style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 1rem; line-height: 1.6;">
-        The Privatemode API key authenticates this proxy with Privatemode's servers.
-        You can get a key from <a href="https://privatemode.ai" target="_blank" style="color: #60a5fa;">privatemode.ai</a>.
-    </p>
-
-    <div style="margin-bottom: 1.5rem;">
-        <div style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.5rem;">If deployed on Fly.io:</div>
-        <div style="background: #0f172a; border-radius: 8px; padding: 1rem; font-family: monospace; font-size: 0.875rem;">
-            <span style="color: #e2e8f0;">fly secrets set PRIVATEMODE_API_KEY=pm_your_key_here</span>
-        </div>
-    </div>
-
-    <div style="margin-bottom: 1rem;">
-        <div style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.5rem;">If using Docker Compose:</div>
-        <div style="background: #0f172a; border-radius: 8px; padding: 1rem; font-family: monospace; font-size: 0.875rem;">
-            <span style="color: #e2e8f0;">PRIVATEMODE_API_KEY=pm_your_key_here docker-compose up -d</span>
-        </div>
-    </div>
-
-    <p style="color: #f59e0b; font-size: 0.875rem; margin-top: 1rem;">
-        Note: After updating the key, you need to restart the proxy for the change to take effect.
-    </p>
-</div>
 """
 
 
@@ -1223,11 +1180,6 @@ async def admin_settings(request: web.Request) -> web.Response:
         pm_key_message = '<p style="color: #f87171; font-size: 0.75rem;">Not configured - set PRIVATEMODE_API_KEY</p>'
         pm_dot_color = '#ef4444'
 
-    # Get configuration values (import at top would create circular import)
-    from config import UPSTREAM_URL, PORT
-    upstream_url = UPSTREAM_URL
-    port = PORT
-
     # Load current rate limit settings
     settings = load_settings()
     csrf_token = generate_csrf_token()
@@ -1237,8 +1189,6 @@ async def admin_settings(request: web.Request) -> web.Response:
         pm_key_status_class=pm_key_status_class,
         pm_key_message=pm_key_message,
         pm_dot_color=pm_dot_color,
-        upstream_url=upstream_url,
-        port=port,
         csrf_token=csrf_token,
         success_message=success_message,
         rate_limit_requests=settings.get('rate_limit_requests', 100),
@@ -1306,8 +1256,7 @@ async def admin_usage(request: web.Request) -> web.Response:
         sorted_keys = sorted(usage_by_key.items(), key=lambda x: x[1]['cost_eur'], reverse=True)
         for key_id, data in sorted_keys:
             rows.append(USAGE_BY_KEY_ROW.format(
-                key_id=escape(key_id),
-                description=escape(key_descriptions.get(key_id, '-')),
+                description=escape(key_descriptions.get(key_id, 'Unknown Key')),
                 tokens=data['tokens'],
                 requests=data['requests'],
                 cost=data['cost_eur']
