@@ -613,7 +613,8 @@ async def admin_login_page(request: web.Request) -> web.Response:
         raise web.HTTPFound('/admin')
 
     error = request.query.get('error', '')
-    error_html = f'<p class="error">{error}</p>' if error else ''
+    # Escape error message to prevent XSS attacks
+    error_html = f'<p class="error">{escape(error)}</p>' if error else ''
 
     csrf_token = generate_csrf_token()
     html = HTML_TEMPLATE.format(
