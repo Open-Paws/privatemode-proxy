@@ -93,13 +93,31 @@ def extract_content(soup: BeautifulSoup) -> tuple[str, str]:
 
 
 def url_to_filename(url: str) -> str:
-    """Convert URL to filename."""
+    """Convert URL to filename safely, preventing path traversal attacks."""
     path = urlparse(url).path.strip('/')
     if not path:
         return "index.md"
     # Replace slashes with underscores
     name = path.replace('/', '_')
+    # Remove any path traversal attempts and dangerous characters
+    # Only allow alphanumeric, underscore, and hyphen
+    import re
+    name = re.sub(r'[^a-zA-Z0-9_\-]', '', name)
+    if not name:
+        return "index.md"
     return f"{name}.md"
+
+
+def safe_join_path(base_dir: str, filename: str) -> str:
+    """Safely join base directory and filename, preventing path traversal."""
+    from pathlib import Path
+    # Resolve to absolute paths
+    base = Path(base_dir).resolve()
+    target = (base / filename).resolve()
+    # Ensure the target is within the base directory
+    if not str(target).startswith(str(base)):
+        raise ValueError(f"Path traversal attempt detected: {filename}")
+    return str(target)
 
 
 def scrape_all():
@@ -116,7 +134,7 @@ def scrape_all():
         title, content = extract_content(soup)
         if content:
             filename = url_to_filename(url)
-            filepath = os.path.join(DOCS_DIR, filename)
+            filepath = safe_join_path(DOCS_DIR, filename)
 
             with open(filepath, 'w') as f:
                 if title:
@@ -133,7 +151,7 @@ def scrape_all():
                     to_visit.append(link)
 
     # Create index
-    with open(os.path.join(DOCS_DIR, "README.md"), 'w') as f:
+    with open(safe_join_path(DOCS_DIR, "README.md"), 'w') as f:
         f.write("# Privatemode Documentation\n\n")
         f.write("Scraped from https://docs.privatemode.ai\n\n")
         f.write("## Pages\n\n")
