@@ -131,9 +131,23 @@ CSRF_TTL = 3600  # 1 hour
 
 
 def _get_fernet_key() -> bytes:
-    """Derive a Fernet key from admin password."""
-    # Use SHA256 to get 32 bytes, then base64 encode for Fernet
-    key_material = hashlib.sha256(ADMIN_PASSWORD.encode()).digest()
+    """Derive a Fernet key from admin password using PBKDF2.
+
+    Uses PBKDF2-HMAC-SHA256 with a fixed salt for key derivation.
+    This is more secure than plain SHA256 as it adds computational cost
+    to prevent brute-force attacks on the password.
+    """
+    # Fixed salt - in production, consider storing a unique salt per deployment
+    # The salt is used to derive a consistent key from the password
+    salt = b'privatemode-proxy-fernet-key-derivation-salt-v1'
+    # Use PBKDF2 with 100,000 iterations (OWASP recommended minimum)
+    key_material = hashlib.pbkdf2_hmac(
+        'sha256',
+        ADMIN_PASSWORD.encode(),
+        salt,
+        iterations=100000,
+        dklen=32  # Fernet requires 32 bytes
+    )
     return base64.urlsafe_b64encode(key_material)
 
 
