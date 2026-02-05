@@ -5,6 +5,7 @@ Scrape Privatemode documentation and save as markdown files.
 
 import os
 import re
+
 import requests
 from bs4 import BeautifulSoup
 from markdownify import markdownify as md
@@ -100,8 +101,7 @@ def url_to_filename(url: str) -> str:
     # Replace slashes with underscores
     name = path.replace('/', '_')
     # Remove any path traversal attempts and dangerous characters
-    # Only allow alphanumeric, underscore, and hyphen
-    import re
+    # Only allow alphanumeric, underscore, and hyphen (block backslashes too)
     name = re.sub(r'[^a-zA-Z0-9_\-]', '', name)
     if not name:
         return "index.md"
@@ -114,8 +114,11 @@ def safe_join_path(base_dir: str, filename: str) -> str:
     # Resolve to absolute paths
     base = Path(base_dir).resolve()
     target = (base / filename).resolve()
-    # Ensure the target is within the base directory
-    if not str(target).startswith(str(base)):
+    # Ensure the target is within the base directory using relative_to()
+    # which is immune to partial string prefix attacks (e.g. /docs vs /docs_evil)
+    try:
+        target.relative_to(base)
+    except ValueError:
         raise ValueError(f"Path traversal attempt detected: {filename}")
     return str(target)
 
@@ -134,7 +137,11 @@ def scrape_all():
         title, content = extract_content(soup)
         if content:
             filename = url_to_filename(url)
-            filepath = safe_join_path(DOCS_DIR, filename)
+            try:
+                filepath = safe_join_path(DOCS_DIR, filename)
+            except ValueError as e:
+                print(f"  Skipping {url}: {e}")
+                continue
 
             with open(filepath, 'w') as f:
                 if title:
