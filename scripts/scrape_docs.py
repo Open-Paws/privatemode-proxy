@@ -102,7 +102,7 @@ def url_to_filename(url: str) -> str:
     name = path.replace('/', '_')
     # Remove any path traversal attempts and dangerous characters
     # Only allow alphanumeric, underscore, and hyphen (block backslashes too)
-    name = re.sub(r'[^a-zA-Z0-9_\-]', '', name)
+    name = re.sub(r'[^a-zA-Z0-9_-]', '', name)
     if not name:
         return "index.md"
     return f"{name}.md"
@@ -114,12 +114,10 @@ def safe_join_path(base_dir: str, filename: str) -> str:
     # Resolve to absolute paths
     base = Path(base_dir).resolve()
     target = (base / filename).resolve()
-    # Ensure the target is within the base directory using relative_to()
+    # Ensure the target is within the base directory using pathlib's semantic check
     # which is immune to partial string prefix attacks (e.g. /docs vs /docs_evil)
-    try:
-        target.relative_to(base)
-    except ValueError:
-        raise ValueError(f"Path traversal attempt detected: {filename}")
+    if target != base and base not in target.parents:
+        raise ValueError(f"Path traversal detected: {filename}")
     return str(target)
 
 
@@ -139,17 +137,17 @@ def scrape_all():
             filename = url_to_filename(url)
             try:
                 filepath = safe_join_path(DOCS_DIR, filename)
-            except ValueError as e:
+
+                with open(filepath, 'w') as f:
+                    if title:
+                        f.write(f"# {title}\n\n")
+                    f.write(content)
+
+                print(f"  Saved: {filename}")
+                pages[url] = {'title': title, 'file': filename}
+            except (ValueError, requests.RequestException) as e:
                 print(f"  Skipping {url}: {e}")
                 continue
-
-            with open(filepath, 'w') as f:
-                if title:
-                    f.write(f"# {title}\n\n")
-                f.write(content)
-
-            print(f"  Saved: {filename}")
-            pages[url] = {'title': title, 'file': filename}
 
         # Discover more links
         for link in extract_nav_links(soup):
