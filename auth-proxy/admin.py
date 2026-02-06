@@ -131,8 +131,8 @@ CSRF_TTL = 3600  # 1 hour
 
 
 PBKDF2_SALT = os.environ.get('PBKDF2_SALT', '').encode()
-if not PBKDF2_SALT:
-    raise ValueError("PBKDF2_SALT environment variable must be set")
+if len(PBKDF2_SALT) < 16:
+    raise ValueError("PBKDF2_SALT environment variable must be at least 16 bytes")
 
 # Cache the derived Fernet key at module level so the expensive PBKDF2
 # computation only runs once (avoids blocking the async event loop on
@@ -159,6 +159,12 @@ def _get_fernet_key() -> bytes:
     )
     _FERNET_KEY = base64.urlsafe_b64encode(key_material)
     return _FERNET_KEY
+
+
+# Derive the key once at import time so the expensive PBKDF2 computation
+# happens during startup, not on the first request (which would block the
+# async event loop).
+_get_fernet_key()
 
 
 def _encrypt_key_for_display(key: str) -> str:

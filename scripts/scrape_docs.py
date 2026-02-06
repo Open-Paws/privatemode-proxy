@@ -5,6 +5,7 @@ Scrape Privatemode documentation and save as markdown files.
 
 import os
 import re
+from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
@@ -110,7 +111,6 @@ def url_to_filename(url: str) -> str:
 
 def safe_join_path(base_dir: str, filename: str) -> str:
     """Safely join base directory and filename, preventing path traversal."""
-    from pathlib import Path
     # Resolve to absolute paths
     base = Path(base_dir).resolve()
     target = (base / filename).resolve()
