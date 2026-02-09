@@ -5,6 +5,8 @@ Scrape Privatemode documentation and save as markdown files.
 
 import os
 import re
+from pathlib import Path
+
 import requests
 from bs4 import BeautifulSoup
 from markdownify import markdownify as md
@@ -93,13 +95,30 @@ def extract_content(soup: BeautifulSoup) -> tuple[str, str]:
 
 
 def url_to_filename(url: str) -> str:
-    """Convert URL to filename."""
+    """Convert URL to filename safely, preventing path traversal attacks."""
     path = urlparse(url).path.strip('/')
     if not path:
         return "index.md"
     # Replace slashes with underscores
     name = path.replace('/', '_')
+    # Remove any path traversal attempts and dangerous characters
+    # Only allow alphanumeric, underscore, and hyphen (block backslashes too)
+    name = re.sub(r'[^a-zA-Z0-9_-]', '', name)
+    if not name:
+        return "index.md"
     return f"{name}.md"
+
+
+def safe_join_path(base_dir: str, filename: str) -> str:
+    """Safely join base directory and filename, preventing path traversal."""
+    # Resolve to absolute paths
+    base = Path(base_dir).resolve()
+    target = (base / filename).resolve()
+    # Ensure the target is within the base directory using pathlib's semantic check
+    # which is immune to partial string prefix attacks (e.g. /docs vs /docs_evil)
+    if target != base and base not in target.parents:
+        raise ValueError(f"Path traversal detected: {filename}")
+    return str(target)
 
 
 def scrape_all():
@@ -116,15 +135,19 @@ def scrape_all():
         title, content = extract_content(soup)
         if content:
             filename = url_to_filename(url)
-            filepath = os.path.join(DOCS_DIR, filename)
+            try:
+                filepath = safe_join_path(DOCS_DIR, filename)
 
-            with open(filepath, 'w') as f:
-                if title:
-                    f.write(f"# {title}\n\n")
-                f.write(content)
+                with open(filepath, 'w') as f:
+                    if title:
+                        f.write(f"# {title}\n\n")
+                    f.write(content)
 
-            print(f"  Saved: {filename}")
-            pages[url] = {'title': title, 'file': filename}
+                print(f"  Saved: {filename}")
+                pages[url] = {'title': title, 'file': filename}
+            except (ValueError, requests.RequestException) as e:
+                print(f"  Skipping {url}: {e}")
+                continue
 
         # Discover more links
         for link in extract_nav_links(soup):
@@ -133,7 +156,7 @@ def scrape_all():
                     to_visit.append(link)
 
     # Create index
-    with open(os.path.join(DOCS_DIR, "README.md"), 'w') as f:
+    with open(safe_join_path(DOCS_DIR, "README.md"), 'w') as f:
         f.write("# Privatemode Documentation\n\n")
         f.write("Scraped from https://docs.privatemode.ai\n\n")
         f.write("## Pages\n\n")

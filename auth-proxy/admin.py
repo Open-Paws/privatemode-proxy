@@ -130,11 +130,41 @@ _csrf_tokens: dict[str, float] = {}
 CSRF_TTL = 3600  # 1 hour
 
 
+PBKDF2_SALT = os.environ.get('PBKDF2_SALT', '').encode()
+if len(PBKDF2_SALT) < 16:
+    raise ValueError("PBKDF2_SALT environment variable must be at least 16 bytes")
+
+# Cache the derived Fernet key at module level so the expensive PBKDF2
+# computation only runs once (avoids blocking the async event loop on
+# every encrypt/decrypt call).
+_FERNET_KEY: bytes | None = None
+
+
 def _get_fernet_key() -> bytes:
-    """Derive a Fernet key from admin password."""
-    # Use SHA256 to get 32 bytes, then base64 encode for Fernet
-    key_material = hashlib.sha256(ADMIN_PASSWORD.encode()).digest()
-    return base64.urlsafe_b64encode(key_material)
+    """Derive a Fernet key from admin password using PBKDF2.
+
+    Uses PBKDF2-HMAC-SHA256 with a configurable salt for key derivation.
+    The key is computed once and cached to avoid blocking the async event loop.
+    """
+    global _FERNET_KEY
+    if _FERNET_KEY is not None:
+        return _FERNET_KEY
+    # Use PBKDF2 with 600,000 iterations (OWASP recommended for HMAC-SHA256)
+    key_material = hashlib.pbkdf2_hmac(
+        'sha256',
+        ADMIN_PASSWORD.encode(),
+        PBKDF2_SALT,
+        iterations=600_000,
+        dklen=32  # Fernet requires 32 bytes
+    )
+    _FERNET_KEY = base64.urlsafe_b64encode(key_material)
+    return _FERNET_KEY
+
+
+# Derive the key once at import time so the expensive PBKDF2 computation
+# happens during startup, not on the first request (which would block the
+# async event loop).
+_get_fernet_key()
 
 
 def _encrypt_key_for_display(key: str) -> str:
@@ -613,7 +643,8 @@ async def admin_login_page(request: web.Request) -> web.Response:
         raise web.HTTPFound('/admin')
 
     error = request.query.get('error', '')
-    error_html = f'<p class="error">{error}</p>' if error else ''
+    # Escape error message to prevent XSS attacks
+    error_html = f'<p class="error">{escape(error)}</p>' if error else ''
 
     csrf_token = generate_csrf_token()
     html = HTML_TEMPLATE.format(
@@ -771,7 +802,7 @@ async def admin_dashboard(request: web.Request) -> web.Response:
     # Determine base URL for usage examples
     scheme = request.headers.get('X-Forwarded-Proto', request.scheme)
     host = request.headers.get('X-Forwarded-Host', request.host)
-    base_url = f"{scheme}://{host}"
+    base_url = escape(f"{scheme}://{host}")
 
     content = DASHBOARD_CONTENT.format(
         keys_table=keys_table,
@@ -1487,27 +1518,21 @@ async def admin_static(request: web.Request) -> web.Response:
     """Serve static files (logo, etc.)."""
     filename = request.match_info.get('filename', '')
 
-    # Security: only allow specific files
-    allowed_files = {'logo.png'}
-    if filename not in allowed_files:
+    # Security: allowlist maps filenames to (relative path, content type).
+    # The user-controlled value is only used as a dict key — the filesystem
+    # path is constructed entirely from hardcoded values, breaking taint flow.
+    static_dir = Path(__file__).parent / 'static'
+    allowed_files = {
+        'logo.png': (static_dir / 'logo.png', 'image/png'),
+    }
+
+    entry = allowed_files.get(filename)
+    if entry is None:
         raise web.HTTPNotFound()
 
-    static_dir = Path(__file__).parent / 'static'
-    file_path = static_dir / filename
-
+    file_path, content_type = entry
     if not file_path.exists():
         raise web.HTTPNotFound()
-
-    # Determine content type
-    content_types = {
-        '.png': 'image/png',
-        '.jpg': 'image/jpeg',
-        '.jpeg': 'image/jpeg',
-        '.svg': 'image/svg+xml',
-        '.ico': 'image/x-icon'
-    }
-    suffix = file_path.suffix.lower()
-    content_type = content_types.get(suffix, 'application/octet-stream')
 
     with open(file_path, 'rb') as f:
         return web.Response(body=f.read(), content_type=content_type)
