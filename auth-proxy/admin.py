@@ -802,7 +802,7 @@ async def admin_dashboard(request: web.Request) -> web.Response:
     # Determine base URL for usage examples
     scheme = request.headers.get('X-Forwarded-Proto', request.scheme)
     host = request.headers.get('X-Forwarded-Host', request.host)
-    base_url = f"{scheme}://{host}"
+    base_url = escape(f"{scheme}://{host}")
 
     content = DASHBOARD_CONTENT.format(
         keys_table=keys_table,
@@ -1518,27 +1518,21 @@ async def admin_static(request: web.Request) -> web.Response:
     """Serve static files (logo, etc.)."""
     filename = request.match_info.get('filename', '')
 
-    # Security: only allow specific files
-    allowed_files = {'logo.png'}
-    if filename not in allowed_files:
+    # Security: allowlist maps filenames to (relative path, content type).
+    # The user-controlled value is only used as a dict key — the filesystem
+    # path is constructed entirely from hardcoded values, breaking taint flow.
+    static_dir = Path(__file__).parent / 'static'
+    allowed_files = {
+        'logo.png': (static_dir / 'logo.png', 'image/png'),
+    }
+
+    entry = allowed_files.get(filename)
+    if entry is None:
         raise web.HTTPNotFound()
 
-    static_dir = Path(__file__).parent / 'static'
-    file_path = static_dir / filename
-
+    file_path, content_type = entry
     if not file_path.exists():
         raise web.HTTPNotFound()
-
-    # Determine content type
-    content_types = {
-        '.png': 'image/png',
-        '.jpg': 'image/jpeg',
-        '.jpeg': 'image/jpeg',
-        '.svg': 'image/svg+xml',
-        '.ico': 'image/x-icon'
-    }
-    suffix = file_path.suffix.lower()
-    content_type = content_types.get(suffix, 'application/octet-stream')
 
     with open(file_path, 'rb') as f:
         return web.Response(body=f.read(), content_type=content_type)
