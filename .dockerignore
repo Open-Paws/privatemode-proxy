@@ -1,0 +1,76 @@
+# ===================
+# Secrets & Credentials (NEVER include in image)
+# ===================
+.env
+.env.*
+secrets/
+*.secret
+*.credentials
+
+# ===================
+# Git
+# ===================
+.git/
+.gitignore
+
+# ===================
+# Documentation (not needed in runtime)
+# ===================
+docs/
+README.md
+LICENSE
+*.md
+
+# ===================
+# Development
+# ===================
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+*~
+
+# ===================
+# Python
+# ===================
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+ENV/
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# ===================
+# Docker
+# ===================
+.docker/
+Dockerfile*
+docker-compose*.yml
+
+# ===================
+# OS Files
+# ===================
+.DS_Store
+Thumbs.db
+
+# ===================
+# Logs & Data
+# ===================
+*.log
+logs/
+data/
+
+# ===================
+# Certificates (mounted at runtime, not baked in)
+# ===================
+certs/
+
+# ===================
+# Scripts (not needed in container)
+# ===================
+scripts/
