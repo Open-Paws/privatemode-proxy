@@ -199,3 +199,7 @@ Never introduce synonyms for:
 ### Structured Coding Reference
 
 For tool-specific AI coding instructions (Claude Code rules, Cursor MDC, Copilot, Windsurf, etc.), copy the corresponding directory from `structured-coding-with-ai` into this project root.
+
+## Decisions Reviewed
+
+Last reviewed: 2026-04-11 (decision #37 audit-to-dispatch, decision #38 external-repo hard gate)
