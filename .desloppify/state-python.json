@@ -1,0 +1,4442 @@
+{
+  "version": 3,
+  "created": "2026-04-12T07:42:28+00:00",
+  "last_scan": "2026-04-12T08:44:51+00:00",
+  "scan_count": 7,
+  "overall_score": 85.5,
+  "objective_score": 73.4,
+  "strict_score": 85.5,
+  "verified_strict_score": 73.4,
+  "stats": {
+    "total": 79,
+    "auto_resolved": 0,
+    "deferred": 0,
+    "false_positive": 0,
+    "fixed": 0,
+    "open": 79,
+    "triaged_out": 0,
+    "wontfix": 0,
+    "by_tier": {
+      "1": {
+        "auto_resolved": 0,
+        "deferred": 0,
+        "false_positive": 0,
+        "fixed": 0,
+        "open": 19,
+        "triaged_out": 0,
+        "wontfix": 0
+      },
+      "2": {
+        "auto_resolved": 0,
+        "deferred": 0,
+        "false_positive": 0,
+        "fixed": 0,
+        "open": 11,
+        "triaged_out": 0,
+        "wontfix": 0
+      },
+      "3": {
+        "auto_resolved": 0,
+        "deferred": 0,
+        "false_positive": 0,
+        "fixed": 0,
+        "open": 49,
+        "triaged_out": 0,
+        "wontfix": 0
+      }
+    }
+  },
+  "work_items": {
+    "unused::scripts/manage_keys.py::os:28": {
+      "id": "unused::scripts/manage_keys.py::os:28",
+      "detector": "unused",
+      "file": "scripts/manage_keys.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: os",
+      "detail": {
+        "line": 28,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_admin.py::json:5": {
+      "id": "unused::tests/test_admin.py::json:5",
+      "detector": "unused",
+      "file": "tests/test_admin.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: json",
+      "detail": {
+        "line": 5,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_endpoints.py::json:7": {
+      "id": "unused::tests/test_endpoints.py::json:7",
+      "detector": "unused",
+      "file": "tests/test_endpoints.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: json",
+      "detail": {
+        "line": 7,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_endpoints.py::time:10": {
+      "id": "unused::tests/test_endpoints.py::time:10",
+      "detector": "unused",
+      "file": "tests/test_endpoints.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: time",
+      "detail": {
+        "line": 10,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_endpoints.py::unittest.mock.MagicMock:11": {
+      "id": "unused::tests/test_endpoints.py::unittest.mock.MagicMock:11",
+      "detector": "unused",
+      "file": "tests/test_endpoints.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: unittest.mock.MagicMock",
+      "detail": {
+        "line": 11,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_endpoints.py::aiohttp.test_utils.AioHTTPTestCase:15": {
+      "id": "unused::tests/test_endpoints.py::aiohttp.test_utils.AioHTTPTestCase:15",
+      "detector": "unused",
+      "file": "tests/test_endpoints.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: aiohttp.test_utils.AioHTTPTestCase",
+      "detail": {
+        "line": 15,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_endpoints.py::aiohttp.test_utils.TestClient:15": {
+      "id": "unused::tests/test_endpoints.py::aiohttp.test_utils.TestClient:15",
+      "detector": "unused",
+      "file": "tests/test_endpoints.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: aiohttp.test_utils.TestClient",
+      "detail": {
+        "line": 15,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_endpoints.py::aiohttp.test_utils.TestServer:15": {
+      "id": "unused::tests/test_endpoints.py::aiohttp.test_utils.TestServer:15",
+      "detector": "unused",
+      "file": "tests/test_endpoints.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: aiohttp.test_utils.TestServer",
+      "detail": {
+        "line": 15,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_endpoints.py::cookies:218": {
+      "id": "unused::tests/test_endpoints.py::cookies:218",
+      "detector": "unused",
+      "file": "tests/test_endpoints.py",
+      "tier": 2,
+      "confidence": "high",
+      "summary": "Unused vars: cookies",
+      "detail": {
+        "line": 218,
+        "category": "vars"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_proxy.py::unittest.mock.AsyncMock:8": {
+      "id": "unused::tests/test_proxy.py::unittest.mock.AsyncMock:8",
+      "detector": "unused",
+      "file": "tests/test_proxy.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: unittest.mock.AsyncMock",
+      "detail": {
+        "line": 8,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_proxy.py::unittest.mock.patch:8": {
+      "id": "unused::tests/test_proxy.py::unittest.mock.patch:8",
+      "detector": "unused",
+      "file": "tests/test_proxy.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: unittest.mock.patch",
+      "detail": {
+        "line": 8,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_proxy.py::unittest.mock.MagicMock:8": {
+      "id": "unused::tests/test_proxy.py::unittest.mock.MagicMock:8",
+      "detector": "unused",
+      "file": "tests/test_proxy.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: unittest.mock.MagicMock",
+      "detail": {
+        "line": 8,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_proxy.py::pytest:10": {
+      "id": "unused::tests/test_proxy.py::pytest:10",
+      "detector": "unused",
+      "file": "tests/test_proxy.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: pytest",
+      "detail": {
+        "line": 10,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_proxy.py::aiohttp.web:11": {
+      "id": "unused::tests/test_proxy.py::aiohttp.web:11",
+      "detector": "unused",
+      "file": "tests/test_proxy.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: aiohttp.web",
+      "detail": {
+        "line": 11,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_proxy.py::aiohttp.test_utils.AioHTTPTestCase:12": {
+      "id": "unused::tests/test_proxy.py::aiohttp.test_utils.AioHTTPTestCase:12",
+      "detector": "unused",
+      "file": "tests/test_proxy.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: aiohttp.test_utils.AioHTTPTestCase",
+      "detail": {
+        "line": 12,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_rate_limiting.py::unittest.mock.MagicMock:8": {
+      "id": "unused::tests/test_rate_limiting.py::unittest.mock.MagicMock:8",
+      "detector": "unused",
+      "file": "tests/test_rate_limiting.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: unittest.mock.MagicMock",
+      "detail": {
+        "line": 8,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_usage_tracker.py::usage_tracker.PRICING:13": {
+      "id": "unused::tests/test_usage_tracker.py::usage_tracker.PRICING:13",
+      "detector": "unused",
+      "file": "tests/test_usage_tracker.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: usage_tracker.PRICING",
+      "detail": {
+        "line": 13,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_utils.py::pytest:9": {
+      "id": "unused::tests/test_utils.py::pytest:9",
+      "detector": "unused",
+      "file": "tests/test_utils.py",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "Unused imports: pytest",
+      "detail": {
+        "line": 9,
+        "category": "imports"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "structural::auth-proxy/admin.py": {
+      "id": "structural::auth-proxy/admin.py",
+      "detector": "structural",
+      "file": "auth-proxy/admin.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Large file: large (1556 LOC)",
+      "detail": {
+        "loc": 1556
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "structural::auth-proxy/server.py": {
+      "id": "structural::auth-proxy/server.py",
+      "detector": "structural",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Large file: large (540 LOC)",
+      "detail": {
+        "loc": 540
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "responsibility_cohesion::auth-proxy/server.py": {
+      "id": "responsibility_cohesion::auth-proxy/server.py",
+      "detector": "responsibility_cohesion",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Mixed responsibilities: 19 top-level funcs across 8 disconnected clusters (8, 5, 1, 1, 1, +3 more)",
+      "detail": {
+        "loc": 540,
+        "function_count": 19,
+        "component_count": 8,
+        "component_sizes": [
+          8,
+          5,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "family_count": 12,
+        "import_cluster_count": 10,
+        "families": [
+          "catch",
+          "check",
+          "create",
+          "detect",
+          "extract",
+          "get",
+          "health",
+          "https"
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "orphaned::auth-proxy/admin.py": {
+      "id": "orphaned::auth-proxy/admin.py",
+      "detector": "orphaned",
+      "file": "auth-proxy/admin.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Orphaned file (1556 LOC): zero importers, not an entry point",
+      "detail": {
+        "loc": 1556
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "orphaned::auth-proxy/server.py": {
+      "id": "orphaned::auth-proxy/server.py",
+      "detector": "orphaned",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Orphaned file (540 LOC): zero importers, not an entry point",
+      "detail": {
+        "loc": 540
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "orphaned::auth-proxy/usage_tracker.py": {
+      "id": "orphaned::auth-proxy/usage_tracker.py",
+      "detector": "orphaned",
+      "file": "auth-proxy/usage_tracker.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Orphaned file (317 LOC): zero importers, not an entry point",
+      "detail": {
+        "loc": 317
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "orphaned::auth-proxy/key_manager.py": {
+      "id": "orphaned::auth-proxy/key_manager.py",
+      "detector": "orphaned",
+      "file": "auth-proxy/key_manager.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Orphaned file (198 LOC): zero importers, not an entry point",
+      "detail": {
+        "loc": 198
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "orphaned::auth-proxy/utils.py": {
+      "id": "orphaned::auth-proxy/utils.py",
+      "detector": "orphaned",
+      "file": "auth-proxy/utils.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Orphaned file (20 LOC): zero importers, not an entry point",
+      "detail": {
+        "loc": 20
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "test_coverage::auth-proxy/utils.py::over_mocked::test_utils.py": {
+      "id": "test_coverage::auth-proxy/utils.py::over_mocked::test_utils.py",
+      "detector": "test_coverage",
+      "file": "auth-proxy/utils.py",
+      "tier": 3,
+      "confidence": "low",
+      "summary": "Over-mocked tests: test_utils.py has 12 mocks vs 6 assertions",
+      "detail": {
+        "kind": "over_mocked",
+        "test_file": "tests/test_utils.py",
+        "mocks": 12,
+        "assertions": 6,
+        "loc_weight": 4.47213595499958
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "test_coverage::scripts/manage_keys.py::untested_module": {
+      "id": "test_coverage::scripts/manage_keys.py::untested_module",
+      "detector": "test_coverage",
+      "file": "scripts/manage_keys.py",
+      "tier": 3,
+      "confidence": "high",
+      "summary": "Untested module (286 LOC, 0 importers)",
+      "detail": {
+        "kind": "untested_module",
+        "loc": 286,
+        "importer_count": 0,
+        "loc_weight": 16.911534525287763
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "test_coverage::scripts/scrape_docs.py::untested_module": {
+      "id": "test_coverage::scripts/scrape_docs.py::untested_module",
+      "detector": "test_coverage",
+      "file": "scripts/scrape_docs.py",
+      "tier": 3,
+      "confidence": "high",
+      "summary": "Untested module (170 LOC, 0 importers)",
+      "detail": {
+        "kind": "untested_module",
+        "loc": 170,
+        "importer_count": 0,
+        "loc_weight": 13.038404810405298
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:28+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/admin.py::silent_except": {
+      "id": "smells::auth-proxy/admin.py::silent_except",
+      "detector": "smells",
+      "file": "auth-proxy/admin.py",
+      "tier": 2,
+      "confidence": "medium",
+      "summary": "4x Except handler silently suppresses error (pass/continue, no log)",
+      "detail": {
+        "smell_id": "silent_except",
+        "severity": "high",
+        "count": 4,
+        "lines": [
+          851,
+          857,
+          969,
+          1000
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/server.py::silent_except": {
+      "id": "smells::auth-proxy/server.py::silent_except",
+      "detector": "smells",
+      "file": "auth-proxy/server.py",
+      "tier": 2,
+      "confidence": "medium",
+      "summary": "1x Except handler silently suppresses error (pass/continue, no log)",
+      "detail": {
+        "smell_id": "silent_except",
+        "severity": "high",
+        "count": 1,
+        "lines": [
+          197
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/key_manager.py::swallowed_error": {
+      "id": "smells::auth-proxy/key_manager.py::swallowed_error",
+      "detector": "smells",
+      "file": "auth-proxy/key_manager.py",
+      "tier": 2,
+      "confidence": "medium",
+      "summary": "2x Catch block that only logs (swallowed error)",
+      "detail": {
+        "smell_id": "swallowed_error",
+        "severity": "high",
+        "count": 2,
+        "lines": [
+          125,
+          135
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/usage_tracker.py::swallowed_error": {
+      "id": "smells::auth-proxy/usage_tracker.py::swallowed_error",
+      "detector": "smells",
+      "file": "auth-proxy/usage_tracker.py",
+      "tier": 2,
+      "confidence": "medium",
+      "summary": "1x Catch block that only logs (swallowed error)",
+      "detail": {
+        "smell_id": "swallowed_error",
+        "severity": "high",
+        "count": 1,
+        "lines": [
+          77
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::scripts/manage_keys.py::sys_exit_in_library": {
+      "id": "smells::scripts/manage_keys.py::sys_exit_in_library",
+      "detector": "smells",
+      "file": "scripts/manage_keys.py",
+      "tier": 2,
+      "confidence": "medium",
+      "summary": "3x sys.exit() outside CLI entry point \u2014 use exceptions",
+      "detail": {
+        "smell_id": "sys_exit_in_library",
+        "severity": "high",
+        "count": 3,
+        "lines": [
+          161,
+          184,
+          236
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/admin.py::annotation_quality": {
+      "id": "smells::auth-proxy/admin.py::annotation_quality",
+      "detector": "smells",
+      "file": "auth-proxy/admin.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "3x Loose type annotation \u2014 use specific types",
+      "detail": {
+        "smell_id": "annotation_quality",
+        "severity": "medium",
+        "count": 3,
+        "lines": [
+          83,
+          93,
+          245
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/key_manager.py::annotation_quality": {
+      "id": "smells::auth-proxy/key_manager.py::annotation_quality",
+      "detector": "smells",
+      "file": "auth-proxy/key_manager.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "1x Loose type annotation \u2014 use specific types",
+      "detail": {
+        "smell_id": "annotation_quality",
+        "severity": "medium",
+        "count": 1,
+        "lines": [
+          172
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/server.py::annotation_quality": {
+      "id": "smells::auth-proxy/server.py::annotation_quality",
+      "detector": "smells",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "7x Loose type annotation \u2014 use specific types",
+      "detail": {
+        "smell_id": "annotation_quality",
+        "severity": "medium",
+        "count": 7,
+        "lines": [
+          30,
+          166,
+          293,
+          320,
+          361,
+          365,
+          519
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/usage_tracker.py::annotation_quality": {
+      "id": "smells::auth-proxy/usage_tracker.py::annotation_quality",
+      "detector": "smells",
+      "file": "auth-proxy/usage_tracker.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "2x Loose type annotation \u2014 use specific types",
+      "detail": {
+        "smell_id": "annotation_quality",
+        "severity": "medium",
+        "count": 2,
+        "lines": [
+          92,
+          131
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::scripts/manage_keys.py::annotation_quality": {
+      "id": "smells::scripts/manage_keys.py::annotation_quality",
+      "detector": "smells",
+      "file": "scripts/manage_keys.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "7x Loose type annotation \u2014 use specific types",
+      "detail": {
+        "smell_id": "annotation_quality",
+        "severity": "medium",
+        "count": 7,
+        "lines": [
+          38,
+          72,
+          115,
+          147,
+          168,
+          227,
+          242
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::scripts/scrape_docs.py::annotation_quality": {
+      "id": "smells::scripts/scrape_docs.py::annotation_quality",
+      "detector": "smells",
+      "file": "scripts/scrape_docs.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "1x Loose type annotation \u2014 use specific types",
+      "detail": {
+        "smell_id": "annotation_quality",
+        "severity": "medium",
+        "count": 1,
+        "lines": [
+          124
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/key_manager.py::optional_param_sprawl": {
+      "id": "smells::auth-proxy/key_manager.py::optional_param_sprawl",
+      "detector": "smells",
+      "file": "auth-proxy/key_manager.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "1x Too many optional params \u2014 consider a config object",
+      "detail": {
+        "smell_id": "optional_param_sprawl",
+        "severity": "medium",
+        "count": 1,
+        "lines": [
+          172
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/usage_tracker.py::optional_param_sprawl": {
+      "id": "smells::auth-proxy/usage_tracker.py::optional_param_sprawl",
+      "detector": "smells",
+      "file": "auth-proxy/usage_tracker.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "1x Too many optional params \u2014 consider a config object",
+      "detail": {
+        "smell_id": "optional_param_sprawl",
+        "severity": "medium",
+        "count": 1,
+        "lines": [
+          92
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/server.py::high_cyclomatic_complexity": {
+      "id": "smells::auth-proxy/server.py::high_cyclomatic_complexity",
+      "detector": "smells",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "1x High cyclomatic complexity (>12 decision points)",
+      "detail": {
+        "smell_id": "high_cyclomatic_complexity",
+        "severity": "medium",
+        "count": 1,
+        "lines": [
+          203
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::scripts/scrape_docs.py::high_cyclomatic_complexity": {
+      "id": "smells::scripts/scrape_docs.py::high_cyclomatic_complexity",
+      "detector": "smells",
+      "file": "scripts/scrape_docs.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "1x High cyclomatic complexity (>12 decision points)",
+      "detail": {
+        "smell_id": "high_cyclomatic_complexity",
+        "severity": "medium",
+        "count": 1,
+        "lines": [
+          124
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/admin.py::magic_number": {
+      "id": "smells::auth-proxy/admin.py::magic_number",
+      "detector": "smells",
+      "file": "auth-proxy/admin.py",
+      "tier": 3,
+      "confidence": "low",
+      "summary": "1x Magic numbers (>1000 in logic)",
+      "detail": {
+        "smell_id": "magic_number",
+        "severity": "low",
+        "count": 1,
+        "lines": [
+          850
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/key_manager.py::magic_number": {
+      "id": "smells::auth-proxy/key_manager.py::magic_number",
+      "detector": "smells",
+      "file": "auth-proxy/key_manager.py",
+      "tier": 3,
+      "confidence": "low",
+      "summary": "1x Magic numbers (>1000 in logic)",
+      "detail": {
+        "smell_id": "magic_number",
+        "severity": "low",
+        "count": 1,
+        "lines": [
+          193
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/usage_tracker.py::magic_number": {
+      "id": "smells::auth-proxy/usage_tracker.py::magic_number",
+      "detector": "smells",
+      "file": "auth-proxy/usage_tracker.py",
+      "tier": 3,
+      "confidence": "low",
+      "summary": "1x Magic numbers (>1000 in logic)",
+      "detail": {
+        "smell_id": "magic_number",
+        "severity": "low",
+        "count": 1,
+        "lines": [
+          86
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::scripts/manage_keys.py::magic_number": {
+      "id": "smells::scripts/manage_keys.py::magic_number",
+      "detector": "smells",
+      "file": "scripts/manage_keys.py",
+      "tier": 3,
+      "confidence": "low",
+      "summary": "2x Magic numbers (>1000 in logic)",
+      "detail": {
+        "smell_id": "magic_number",
+        "severity": "low",
+        "count": 2,
+        "lines": [
+          90,
+          201
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/admin.py::global_keyword": {
+      "id": "smells::auth-proxy/admin.py::global_keyword",
+      "detector": "smells",
+      "file": "auth-proxy/admin.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "1x Global keyword usage",
+      "detail": {
+        "smell_id": "global_keyword",
+        "severity": "medium",
+        "count": 1,
+        "lines": [
+          149
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/server.py::global_keyword": {
+      "id": "smells::auth-proxy/server.py::global_keyword",
+      "detector": "smells",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "1x Global keyword usage",
+      "detail": {
+        "smell_id": "global_keyword",
+        "severity": "medium",
+        "count": 1,
+        "lines": [
+          70
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/usage_tracker.py::global_keyword": {
+      "id": "smells::auth-proxy/usage_tracker.py::global_keyword",
+      "detector": "smells",
+      "file": "auth-proxy/usage_tracker.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "1x Global keyword usage",
+      "detail": {
+        "smell_id": "global_keyword",
+        "severity": "medium",
+        "count": 1,
+        "lines": [
+          314
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/key_manager.py::broad_except": {
+      "id": "smells::auth-proxy/key_manager.py::broad_except",
+      "detector": "smells",
+      "file": "auth-proxy/key_manager.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "2x Broad except \u2014 check library exceptions before narrowing",
+      "detail": {
+        "smell_id": "broad_except",
+        "severity": "medium",
+        "count": 2,
+        "lines": [
+          125,
+          135
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::auth-proxy/server.py::broad_except": {
+      "id": "smells::auth-proxy/server.py::broad_except",
+      "detector": "smells",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "1x Broad except \u2014 check library exceptions before narrowing",
+      "detail": {
+        "smell_id": "broad_except",
+        "severity": "medium",
+        "count": 1,
+        "lines": [
+          284
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::scripts/scrape_docs.py::broad_except": {
+      "id": "smells::scripts/scrape_docs.py::broad_except",
+      "detector": "smells",
+      "file": "scripts/scrape_docs.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "1x Broad except \u2014 check library exceptions before narrowing",
+      "detail": {
+        "smell_id": "broad_except",
+        "severity": "medium",
+        "count": 1,
+        "lines": [
+          44
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "smells::tests/test_usage_tracker.py::unused_loop_var": {
+      "id": "smells::tests/test_usage_tracker.py::unused_loop_var",
+      "detector": "smells",
+      "file": "tests/test_usage_tracker.py",
+      "tier": 3,
+      "confidence": "low",
+      "summary": "1x Unused loop control variable",
+      "detail": {
+        "smell_id": "unused_loop_var",
+        "severity": "medium",
+        "count": 1,
+        "lines": [
+          92
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "global_mutable_config::auth-proxy/admin.py::_sessions": {
+      "id": "global_mutable_config::auth-proxy/admin.py::_sessions",
+      "detector": "global_mutable_config",
+      "file": "auth-proxy/admin.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Module-level mutable '_sessions' (line 38) modified from 2 site(s)",
+      "detail": {
+        "mutation_count": 2,
+        "mutation_lines": [
+          50,
+          72
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "global_mutable_config::auth-proxy/admin.py::_csrf_tokens": {
+      "id": "global_mutable_config::auth-proxy/admin.py::_csrf_tokens",
+      "detector": "global_mutable_config",
+      "file": "auth-proxy/admin.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Module-level mutable '_csrf_tokens' (line 129) modified from 2 site(s)",
+      "detail": {
+        "mutation_count": 2,
+        "mutation_lines": [
+          193,
+          202
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "global_mutable_config::auth-proxy/admin.py::_login_attempts": {
+      "id": "global_mutable_config::auth-proxy/admin.py::_login_attempts",
+      "detector": "global_mutable_config",
+      "file": "auth-proxy/admin.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Module-level mutable '_login_attempts' (line 42) modified from 1 site(s)",
+      "detail": {
+        "mutation_count": 1,
+        "mutation_lines": [
+          224
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "global_mutable_config::auth-proxy/admin.py::_pending_keys": {
+      "id": "global_mutable_config::auth-proxy/admin.py::_pending_keys",
+      "detector": "global_mutable_config",
+      "file": "auth-proxy/admin.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Module-level mutable '_pending_keys' (line 125) modified from 2 site(s)",
+      "detail": {
+        "mutation_count": 2,
+        "mutation_lines": [
+          727,
+          867
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "global_mutable_config::auth-proxy/server.py::global_rate_limit_store": {
+      "id": "global_mutable_config::auth-proxy/server.py::global_rate_limit_store",
+      "detector": "global_mutable_config",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Module-level mutable 'global_rate_limit_store' (line 44) modified from 2 site(s)",
+      "detail": {
+        "mutation_count": 2,
+        "mutation_lines": [
+          79,
+          87
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "global_mutable_config::auth-proxy/server.py::rate_limit_store": {
+      "id": "global_mutable_config::auth-proxy/server.py::rate_limit_store",
+      "detector": "global_mutable_config",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Module-level mutable 'rate_limit_store' (line 41) modified from 1 site(s)",
+      "detail": {
+        "mutation_count": 1,
+        "mutation_lines": [
+          108
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "global_mutable_config::auth-proxy/server.py::ip_rate_limit_store": {
+      "id": "global_mutable_config::auth-proxy/server.py::ip_rate_limit_store",
+      "detector": "global_mutable_config",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Module-level mutable 'ip_rate_limit_store' (line 47) modified from 1 site(s)",
+      "detail": {
+        "mutation_count": 1,
+        "mutation_lines": [
+          132
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "global_mutable_config::auth-proxy/usage_tracker.py::_tracker": {
+      "id": "global_mutable_config::auth-proxy/usage_tracker.py::_tracker",
+      "detector": "global_mutable_config",
+      "file": "auth-proxy/usage_tracker.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Module-level mutable '_tracker' (line 309) modified from 1 site(s)",
+      "detail": {
+        "mutation_count": 1,
+        "mutation_lines": [
+          316
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "global_mutable_config::scripts/scrape_docs.py::visited": {
+      "id": "global_mutable_config::scripts/scrape_docs.py::visited",
+      "detector": "global_mutable_config",
+      "file": "scripts/scrape_docs.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Module-level mutable 'visited' (line 28) modified from 1 site(s)",
+      "detail": {
+        "mutation_count": 1,
+        "mutation_lines": [
+          38
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "global_mutable_config::scripts/scrape_docs.py::pages": {
+      "id": "global_mutable_config::scripts/scrape_docs.py::pages",
+      "detector": "global_mutable_config",
+      "file": "scripts/scrape_docs.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Module-level mutable 'pages' (line 29) modified from 1 site(s)",
+      "detail": {
+        "mutation_count": 1,
+        "mutation_lines": [
+          147
+        ]
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "global_mutable_config::tests/test_rate_limiting.py::global_rate_limit_store": {
+      "id": "global_mutable_config::tests/test_rate_limiting.py::global_rate_limit_store",
+      "detector": "global_mutable_config",
+      "file": "tests/test_rate_limiting.py",
+      "tier": 3,
+      "confidence": "high",
+      "summary": "'from server import global_rate_limit_store' creates stale binding - 'global_rate_limit_store' is reassigned at runtime. Import the module instead.",
+      "detail": {
+        "mutation_count": 0,
+        "mutation_lines": []
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "security::auth-proxy/key_manager.py::security::log_sensitive::auth-proxy/key_manager.py::89": {
+      "id": "security::auth-proxy/key_manager.py::security::log_sensitive::auth-proxy/key_manager.py::89",
+      "detector": "security",
+      "file": "auth-proxy/key_manager.py",
+      "tier": 2,
+      "confidence": "medium",
+      "summary": "Sensitive data may be logged",
+      "detail": {
+        "kind": "log_sensitive",
+        "severity": "medium",
+        "line": 89,
+        "content": "                print(f\"Warning: Keys file {self.keys_file} not found and no API_KEYS env var set\")",
+        "remediation": "Remove sensitive data from log statements"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "zone": "production",
+      "lang": "python",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "security::auth-proxy/server.py::security::B104::auth-proxy/server.py::540": {
+      "id": "security::auth-proxy/server.py::security::B104::auth-proxy/server.py::540",
+      "detector": "security",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "[B104] Possible binding to all interfaces.",
+      "detail": {
+        "kind": "B104",
+        "severity": "medium",
+        "line": 540,
+        "content": "539 \n540     web.run_app(app, host='0.0.0.0', port=PORT, ssl_context=ssl_context)\n",
+        "remediation": "https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html",
+        "test_name": "hardcoded_bind_all_interfaces",
+        "source": "bandit"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "zone": "production",
+      "lang": "python",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "dict_keys::auth-proxy/server.py::overwritten_key::usage::prompt_tokens": {
+      "id": "dict_keys::auth-proxy/server.py::overwritten_key::usage::prompt_tokens",
+      "detector": "dict_keys",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Dict key \"prompt_tokens\" overwritten on `usage` at line 195 (previously set at line 187, never read between)",
+      "detail": {
+        "kind": "overwritten_key",
+        "key": "prompt_tokens",
+        "line": 195,
+        "info": "in extract_usage_from_response()"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "dict_keys::auth-proxy/server.py::overwritten_key::usage::completion_tokens": {
+      "id": "dict_keys::auth-proxy/server.py::overwritten_key::usage::completion_tokens",
+      "detector": "dict_keys",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Dict key \"completion_tokens\" overwritten on `usage` at line 188 (previously set at line 171, never read between)",
+      "detail": {
+        "kind": "overwritten_key",
+        "key": "completion_tokens",
+        "line": 188,
+        "info": "in extract_usage_from_response()"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "dict_keys::auth-proxy/server.py::overwritten_key::usage::total_tokens": {
+      "id": "dict_keys::auth-proxy/server.py::overwritten_key::usage::total_tokens",
+      "detector": "dict_keys",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Dict key \"total_tokens\" overwritten on `usage` at line 194 (previously set at line 189, never read between)",
+      "detail": {
+        "kind": "overwritten_key",
+        "key": "total_tokens",
+        "line": 194,
+        "info": "in extract_usage_from_response()"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "dict_keys::auth-proxy/server.py::overwritten_key::usage::model": {
+      "id": "dict_keys::auth-proxy/server.py::overwritten_key::usage::model",
+      "detector": "dict_keys",
+      "file": "auth-proxy/server.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Dict key \"model\" overwritten on `usage` at line 182 (previously set at line 171, never read between)",
+      "detail": {
+        "kind": "overwritten_key",
+        "key": "model",
+        "line": 182,
+        "info": "in extract_usage_from_response()"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "dict_keys::scripts/manage_keys.py::overwritten_key::entry::expires_at": {
+      "id": "dict_keys::scripts/manage_keys.py::overwritten_key::entry::expires_at",
+      "detector": "dict_keys",
+      "file": "scripts/manage_keys.py",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Dict key \"expires_at\" overwritten on `entry` at line 205 (previously set at line 201, never read between)",
+      "detail": {
+        "kind": "overwritten_key",
+        "key": "expires_at",
+        "line": 205,
+        "info": "in cmd_rotate()"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "dict_keys::scripts/manage_keys.py::schema_drift::rotated_from::191": {
+      "id": "dict_keys::scripts/manage_keys.py::schema_drift::rotated_from::191",
+      "detector": "dict_keys",
+      "file": "scripts/manage_keys.py",
+      "tier": 2,
+      "confidence": "high",
+      "summary": "Schema drift: 8/9 dict literals use different key, but scripts/manage_keys.py:191 uses \"rotated_from\".",
+      "detail": {
+        "kind": "schema_drift",
+        "key": "rotated_from",
+        "line": 191,
+        "info": "Cluster of 9 similar dict literals. Key \"rotated_from\" appears in only 1. Consensus keys: ['created_at', 'description', 'enabled', 'key_hash', 'key_id']"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:42:29+00:00",
+      "last_seen": "2026-04-12T08:44:51+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "unused::tests/test_endpoints.py::cookies:215": {
+      "id": "unused::tests/test_endpoints.py::cookies:215",
+      "detector": "unused",
+      "file": "tests/test_endpoints.py",
+      "tier": 2,
+      "confidence": "high",
+      "summary": "Unused vars: cookies",
+      "detail": {
+        "line": 215,
+        "category": "vars"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:44:02+00:00",
+      "last_seen": "2026-04-12T08:28:08+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "test",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "dict_keys::scripts/manage_keys.py::schema_drift::rotated_from::190": {
+      "id": "dict_keys::scripts/manage_keys.py::schema_drift::rotated_from::190",
+      "detector": "dict_keys",
+      "file": "scripts/manage_keys.py",
+      "tier": 2,
+      "confidence": "high",
+      "summary": "Schema drift: 8/9 dict literals use different key, but scripts/manage_keys.py:190 uses \"rotated_from\".",
+      "detail": {
+        "kind": "schema_drift",
+        "key": "rotated_from",
+        "line": 190,
+        "info": "Cluster of 9 similar dict literals. Key \"rotated_from\" appears in only 1. Consensus keys: ['created_at', 'description', 'enabled', 'key_hash', 'key_id']"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T07:44:04+00:00",
+      "last_seen": "2026-04-12T08:28:08+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "mechanical_defect",
+      "issue_kind": "mechanical_defect",
+      "origin": "scan",
+      "lang": "python",
+      "zone": "script",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "review::.::holistic::error_consistency::proxy-error-print-not-logger": {
+      "id": "review::.::holistic::error_consistency::proxy-error-print-not-logger",
+      "detector": "review",
+      "file": ".",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "In proxy_request(), the catch-all Exception handler logs via print() rather than logger.exception(), losing the stack trace in structured logging setups.",
+      "detail": {
+        "holistic": true,
+        "dimension": "error_consistency",
+        "related_files": [
+          "auth-proxy/server.py"
+        ],
+        "evidence": [
+          "Line 285: print(f'Proxy error: {e}')"
+        ],
+        "suggestion": "Replace print(f'Proxy error: {e}') with logger.exception('Proxy error') to capture the full stack trace.",
+        "reasoning": "",
+        "summary_hash": "6fb36f8f"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T08:43:35+00:00",
+      "last_seen": "2026-04-12T08:43:35+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "review_defect",
+      "issue_kind": "review_defect",
+      "origin": "review_import",
+      "lang": "python",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "review::.::holistic::ai_generated_debt::sliding-window-duplicated": {
+      "id": "review::.::holistic::ai_generated_debt::sliding-window-duplicated",
+      "detector": "review",
+      "file": ".",
+      "tier": 1,
+      "confidence": "high",
+      "summary": "check_global_rate_limit(), check_per_key_rate_limit(), and check_ip_rate_limit() each contain identical sliding-window timestamp cleanup logic (list comprehension filtering by window_start). Triplicated verbatim.",
+      "detail": {
+        "holistic": true,
+        "dimension": "ai_generated_debt",
+        "related_files": [
+          "auth-proxy/server.py"
+        ],
+        "evidence": [
+          "Line 79: global_rate_limit_store = [ts for ts in global_rate_limit_store if ts > window_start]",
+          "Line 108: rate_limit_store[key_id] = [ts for ts in rate_limit_store[key_id] if ts > window_start]",
+          "Line 132: ip_rate_limit_store[ip] = [ts for ts in ip_rate_limit_store[ip] if ts > window_start]"
+        ],
+        "suggestion": "Extract _sliding_window_clean(store: list, window: float) -> list helper. Each rate limit function calls it instead of inlining the cleanup.",
+        "reasoning": "",
+        "summary_hash": "e77d9826"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T08:43:35+00:00",
+      "last_seen": "2026-04-12T08:43:35+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "review_defect",
+      "issue_kind": "review_defect",
+      "origin": "review_import",
+      "lang": "python",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "review::.::holistic::initialization_coupling::global-rate-limit-store-reassignment": {
+      "id": "review::.::holistic::initialization_coupling::global-rate-limit-store-reassignment",
+      "detector": "review",
+      "file": ".",
+      "tier": 2,
+      "confidence": "medium",
+      "summary": "global_rate_limit_store is a module-level list that gets reassigned (not mutated) inside check_global_rate_limit, making test fixtures that clear-by-reference ineffective. Tests work around this with slice mutation.",
+      "detail": {
+        "holistic": true,
+        "dimension": "initialization_coupling",
+        "related_files": [
+          "auth-proxy/server.py",
+          "tests/test_rate_limiting.py"
+        ],
+        "evidence": [
+          "Line 79: global_rate_limit_store = [ts ...]  # reassigns, breaks clear-by-ref",
+          "test_rate_limiting.py:84: server.global_rate_limit_store[:] = [...] # workaround"
+        ],
+        "suggestion": "Use rate_limit_store[key_id] pattern (mutate in place) for global store too, or convert to a dict-backed store like the per-key and IP stores.",
+        "reasoning": "",
+        "summary_hash": "9958ab02"
+      },
+      "status": "open",
+      "note": null,
+      "first_seen": "2026-04-12T08:43:35+00:00",
+      "last_seen": "2026-04-12T08:43:35+00:00",
+      "resolved_at": null,
+      "reopen_count": 0,
+      "work_item_kind": "review_defect",
+      "issue_kind": "review_defect",
+      "origin": "review_import",
+      "lang": "python",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    }
+  },
+  "scan_coverage": {
+    "python": {
+      "status": "full",
+      "confidence": 1.0,
+      "detectors": {
+        "security": {
+          "detector": "security",
+          "status": "full",
+          "confidence": 1.0,
+          "summary": "Security coverage complete for enabled detectors.",
+          "impact": "",
+          "remediation": "",
+          "tool": "",
+          "reason": ""
+        }
+      },
+      "warnings": [],
+      "updated_at": "2026-04-12T08:44:51+00:00"
+    }
+  },
+  "score_confidence": {
+    "status": "full",
+    "confidence": 1.0,
+    "detectors": [],
+    "dimensions": []
+  },
+  "scan_metadata": {
+    "source": "scan"
+  },
+  "subjective_integrity": {
+    "status": "disabled",
+    "target_score": 85.0,
+    "matched_count": 0,
+    "matched_dimensions": [],
+    "reset_dimensions": []
+  },
+  "subjective_assessments": {
+    "naming_quality": {
+      "score": 90,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "logic_clarity": {
+      "score": 90,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "type_safety": {
+      "score": 88,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "contract_coherence": {
+      "score": 91,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "error_consistency": {
+      "score": 85,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "abstraction_fitness": {
+      "score": 88,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "ai_generated_debt": {
+      "score": 82,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "high_level_elegance": {
+      "score": 88,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "mid_level_elegance": {
+      "score": 90,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "low_level_elegance": {
+      "score": 89,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "cross_module_architecture": {
+      "score": 88,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "initialization_coupling": {
+      "score": 86,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "convention_outlier": {
+      "score": 90,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "dependency_health": {
+      "score": 87,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "test_strategy": {
+      "score": 88,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "api_surface_coherence": {
+      "score": 92,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "authorization_consistency": {
+      "score": 94,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "incomplete_migration": {
+      "score": 88,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "package_organization": {
+      "score": 88,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "design_coherence": {
+      "score": 90,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "advocacy_language_quality": {
+      "score": 90,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "advocacy_security_posture": {
+      "score": 96,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "advocacy_terminology_consistency": {
+      "score": 85,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "advocacy_data_sovereignty": {
+      "score": 95,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "advocacy_ux_inclusivity": {
+      "score": 82,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    },
+    "advocacy_tool_integration": {
+      "score": 90,
+      "source": "manual_override",
+      "assessed_at": "2026-04-12T08:43:36+00:00",
+      "provisional_override": true,
+      "provisional_until_scan": 6
+    }
+  },
+  "scan_history": [
+    {
+      "timestamp": "2026-04-12T07:42:30+00:00",
+      "lang": "python",
+      "strict_score": 18.4,
+      "verified_strict_score": 73.7,
+      "objective_score": 73.7,
+      "overall_score": 18.4,
+      "open": 74,
+      "diff_new": 74,
+      "diff_resolved": 0,
+      "ignored": 0,
+      "raw_issues": 76,
+      "suppressed_pct": 0.0,
+      "ignore_patterns": 0,
+      "subjective_integrity": {
+        "status": "pass",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": 85.0
+      },
+      "score_confidence": {
+        "status": "full",
+        "confidence": 1.0,
+        "detector_count": 0,
+        "dimension_count": 0
+      },
+      "dimension_scores": {
+        "Code quality": {
+          "score": 55.8,
+          "strict": 55.8
+        },
+        "Security": {
+          "score": 94.4,
+          "strict": 94.4
+        },
+        "File health": {
+          "score": 80.0,
+          "strict": 80.0
+        },
+        "Test health": {
+          "score": 73.3,
+          "strict": 73.3
+        },
+        "Advocacy security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction fit": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Data sovereignty": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy language": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy security (subjective)": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy terminology": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy tools": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy UX": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "AI generated debt": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "API coherence": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Auth consistency": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Contracts": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Convention drift": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Cross-module arch": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Dep health": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Design coherence": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Error consistency": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "High elegance": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Stale migration": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Init coupling": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Logic clarity": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Low elegance": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Mid elegance": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Naming quality": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Structure nav": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Test strategy": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Type safety": {
+          "score": 0.0,
+          "strict": 0.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T07:44:04+00:00",
+      "lang": "python",
+      "strict_score": 18.7,
+      "verified_strict_score": 74.9,
+      "objective_score": 74.9,
+      "overall_score": 18.7,
+      "open": 71,
+      "diff_new": 2,
+      "diff_resolved": 0,
+      "ignored": 5,
+      "raw_issues": 59,
+      "suppressed_pct": 8.5,
+      "ignore_patterns": 5,
+      "subjective_integrity": {
+        "status": "pass",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": 85.0
+      },
+      "score_confidence": {
+        "status": "full",
+        "confidence": 1.0,
+        "detector_count": 0,
+        "dimension_count": 0
+      },
+      "dimension_scores": {
+        "Code quality": {
+          "score": 61.5,
+          "strict": 61.5
+        },
+        "Security": {
+          "score": 94.4,
+          "strict": 94.4
+        },
+        "File health": {
+          "score": 80.0,
+          "strict": 80.0
+        },
+        "Test health": {
+          "score": 73.3,
+          "strict": 73.3
+        },
+        "Advocacy security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction fit": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Data sovereignty": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy language": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy security (subjective)": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy terminology": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy tools": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy UX": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "AI generated debt": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "API coherence": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Auth consistency": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Contracts": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Convention drift": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Cross-module arch": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Dep health": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Design coherence": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Error consistency": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "High elegance": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Stale migration": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Init coupling": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Logic clarity": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Low elegance": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Mid elegance": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Naming quality": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Structure nav": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Test strategy": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Type safety": {
+          "score": 0.0,
+          "strict": 0.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T08:27:23+00:00",
+      "lang": "python",
+      "strict_score": 18.7,
+      "verified_strict_score": 74.9,
+      "objective_score": 74.9,
+      "overall_score": 18.7,
+      "open": 71,
+      "diff_new": 0,
+      "diff_resolved": 0,
+      "ignored": 5,
+      "raw_issues": 59,
+      "suppressed_pct": 8.5,
+      "ignore_patterns": 5,
+      "subjective_integrity": {
+        "status": "pass",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": 85.0
+      },
+      "score_confidence": {
+        "status": "full",
+        "confidence": 1.0,
+        "detector_count": 0,
+        "dimension_count": 0
+      },
+      "dimension_scores": {
+        "Code quality": {
+          "score": 61.5,
+          "strict": 61.5
+        },
+        "Security": {
+          "score": 94.4,
+          "strict": 94.4
+        },
+        "File health": {
+          "score": 80.0,
+          "strict": 80.0
+        },
+        "Test health": {
+          "score": 73.3,
+          "strict": 73.3
+        },
+        "Advocacy security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction fit": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Data sovereignty": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy language": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy security (subjective)": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy terminology": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy tools": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy UX": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "AI generated debt": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "API coherence": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Auth consistency": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Contracts": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Convention drift": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Cross-module arch": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Dep health": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Design coherence": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Error consistency": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "High elegance": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Stale migration": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Init coupling": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Logic clarity": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Low elegance": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Mid elegance": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Naming quality": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Structure nav": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Test strategy": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Type safety": {
+          "score": 0.0,
+          "strict": 0.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T08:28:08+00:00",
+      "lang": "python",
+      "strict_score": 18.7,
+      "verified_strict_score": 74.9,
+      "objective_score": 74.9,
+      "overall_score": 18.7,
+      "open": 71,
+      "diff_new": 0,
+      "diff_resolved": 0,
+      "ignored": 5,
+      "raw_issues": 59,
+      "suppressed_pct": 8.5,
+      "ignore_patterns": 5,
+      "subjective_integrity": {
+        "status": "pass",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": 85.0
+      },
+      "score_confidence": {
+        "status": "full",
+        "confidence": 1.0,
+        "detector_count": 0,
+        "dimension_count": 0
+      },
+      "dimension_scores": {
+        "Code quality": {
+          "score": 61.5,
+          "strict": 61.5
+        },
+        "Security": {
+          "score": 94.4,
+          "strict": 94.4
+        },
+        "File health": {
+          "score": 80.0,
+          "strict": 80.0
+        },
+        "Test health": {
+          "score": 73.3,
+          "strict": 73.3
+        },
+        "Advocacy security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction fit": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Data sovereignty": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy language": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy security (subjective)": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy terminology": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy tools": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Advocacy UX": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "AI generated debt": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "API coherence": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Auth consistency": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Contracts": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Convention drift": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Cross-module arch": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Dep health": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Design coherence": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Error consistency": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "High elegance": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Stale migration": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Init coupling": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Logic clarity": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Low elegance": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Mid elegance": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Naming quality": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Structure nav": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Test strategy": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Type safety": {
+          "score": 0.0,
+          "strict": 0.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T08:43:35+00:00",
+      "lang": "python",
+      "strict_score": 85.8,
+      "verified_strict_score": 74.9,
+      "objective_score": 74.9,
+      "overall_score": 85.8,
+      "open": 74,
+      "diff_new": 3,
+      "diff_resolved": 0,
+      "ignored": 0,
+      "raw_issues": 3,
+      "suppressed_pct": 0.0,
+      "ignore_patterns": 0,
+      "subjective_integrity": {
+        "status": "disabled",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": null
+      },
+      "score_confidence": {
+        "status": "full",
+        "confidence": 1.0,
+        "detector_count": 0,
+        "dimension_count": 0
+      },
+      "dimension_scores": {
+        "Code quality": {
+          "score": 61.5,
+          "strict": 61.5
+        },
+        "Security": {
+          "score": 94.4,
+          "strict": 94.4
+        },
+        "File health": {
+          "score": 80.0,
+          "strict": 80.0
+        },
+        "Test health": {
+          "score": 73.3,
+          "strict": 73.3
+        },
+        "Advocacy security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction fit": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Data sovereignty": {
+          "score": 95.0,
+          "strict": 95.0
+        },
+        "Advocacy language": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Advocacy security (subjective)": {
+          "score": 96.0,
+          "strict": 96.0
+        },
+        "Advocacy terminology": {
+          "score": 85.0,
+          "strict": 85.0
+        },
+        "Advocacy tools": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Advocacy UX": {
+          "score": 82.0,
+          "strict": 82.0
+        },
+        "AI generated debt": {
+          "score": 82.0,
+          "strict": 82.0
+        },
+        "API coherence": {
+          "score": 92.0,
+          "strict": 92.0
+        },
+        "Auth consistency": {
+          "score": 94.0,
+          "strict": 94.0
+        },
+        "Contracts": {
+          "score": 91.0,
+          "strict": 91.0
+        },
+        "Convention drift": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Cross-module arch": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Dep health": {
+          "score": 87.0,
+          "strict": 87.0
+        },
+        "Design coherence": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Error consistency": {
+          "score": 85.0,
+          "strict": 85.0
+        },
+        "High elegance": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Stale migration": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Init coupling": {
+          "score": 86.0,
+          "strict": 86.0
+        },
+        "Logic clarity": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Low elegance": {
+          "score": 89.0,
+          "strict": 89.0
+        },
+        "Mid elegance": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Naming quality": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Structure nav": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Test strategy": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Type safety": {
+          "score": 88.0,
+          "strict": 88.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T08:44:07+00:00",
+      "lang": "python",
+      "strict_score": 85.5,
+      "verified_strict_score": 73.4,
+      "objective_score": 73.4,
+      "overall_score": 85.5,
+      "open": 79,
+      "diff_new": 0,
+      "diff_resolved": 0,
+      "ignored": 0,
+      "raw_issues": 76,
+      "suppressed_pct": 0.0,
+      "ignore_patterns": 0,
+      "subjective_integrity": {
+        "status": "disabled",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": 85.0
+      },
+      "score_confidence": {
+        "status": "full",
+        "confidence": 1.0,
+        "detector_count": 0,
+        "dimension_count": 0
+      },
+      "dimension_scores": {
+        "Code quality": {
+          "score": 54.8,
+          "strict": 54.8
+        },
+        "Security": {
+          "score": 94.4,
+          "strict": 94.4
+        },
+        "File health": {
+          "score": 80.0,
+          "strict": 80.0
+        },
+        "Test health": {
+          "score": 73.3,
+          "strict": 73.3
+        },
+        "Advocacy security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction fit": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Data sovereignty": {
+          "score": 95.0,
+          "strict": 95.0
+        },
+        "Advocacy language": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Advocacy security (subjective)": {
+          "score": 96.0,
+          "strict": 96.0
+        },
+        "Advocacy terminology": {
+          "score": 85.0,
+          "strict": 85.0
+        },
+        "Advocacy tools": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Advocacy UX": {
+          "score": 82.0,
+          "strict": 82.0
+        },
+        "AI generated debt": {
+          "score": 82.0,
+          "strict": 82.0
+        },
+        "API coherence": {
+          "score": 92.0,
+          "strict": 92.0
+        },
+        "Auth consistency": {
+          "score": 94.0,
+          "strict": 94.0
+        },
+        "Contracts": {
+          "score": 91.0,
+          "strict": 91.0
+        },
+        "Convention drift": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Cross-module arch": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Dep health": {
+          "score": 87.0,
+          "strict": 87.0
+        },
+        "Design coherence": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Error consistency": {
+          "score": 85.0,
+          "strict": 85.0
+        },
+        "High elegance": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Stale migration": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Init coupling": {
+          "score": 86.0,
+          "strict": 86.0
+        },
+        "Logic clarity": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Low elegance": {
+          "score": 89.0,
+          "strict": 89.0
+        },
+        "Mid elegance": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Naming quality": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Structure nav": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Test strategy": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Type safety": {
+          "score": 88.0,
+          "strict": 88.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T08:44:51+00:00",
+      "lang": "python",
+      "strict_score": 85.5,
+      "verified_strict_score": 73.4,
+      "objective_score": 73.4,
+      "overall_score": 85.5,
+      "open": 79,
+      "diff_new": 0,
+      "diff_resolved": 0,
+      "ignored": 0,
+      "raw_issues": 76,
+      "suppressed_pct": 0.0,
+      "ignore_patterns": 0,
+      "subjective_integrity": {
+        "status": "disabled",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": 85.0
+      },
+      "score_confidence": {
+        "status": "full",
+        "confidence": 1.0,
+        "detector_count": 0,
+        "dimension_count": 0
+      },
+      "dimension_scores": {
+        "Code quality": {
+          "score": 54.8,
+          "strict": 54.8
+        },
+        "Security": {
+          "score": 94.4,
+          "strict": 94.4
+        },
+        "File health": {
+          "score": 80.0,
+          "strict": 80.0
+        },
+        "Test health": {
+          "score": 73.3,
+          "strict": 73.3
+        },
+        "Advocacy security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction fit": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Data sovereignty": {
+          "score": 95.0,
+          "strict": 95.0
+        },
+        "Advocacy language": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Advocacy security (subjective)": {
+          "score": 96.0,
+          "strict": 96.0
+        },
+        "Advocacy terminology": {
+          "score": 85.0,
+          "strict": 85.0
+        },
+        "Advocacy tools": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Advocacy UX": {
+          "score": 82.0,
+          "strict": 82.0
+        },
+        "AI generated debt": {
+          "score": 82.0,
+          "strict": 82.0
+        },
+        "API coherence": {
+          "score": 92.0,
+          "strict": 92.0
+        },
+        "Auth consistency": {
+          "score": 94.0,
+          "strict": 94.0
+        },
+        "Contracts": {
+          "score": 91.0,
+          "strict": 91.0
+        },
+        "Convention drift": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Cross-module arch": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Dep health": {
+          "score": 87.0,
+          "strict": 87.0
+        },
+        "Design coherence": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Error consistency": {
+          "score": 85.0,
+          "strict": 85.0
+        },
+        "High elegance": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Stale migration": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Init coupling": {
+          "score": 86.0,
+          "strict": 86.0
+        },
+        "Logic clarity": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Low elegance": {
+          "score": 89.0,
+          "strict": 89.0
+        },
+        "Mid elegance": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Naming quality": {
+          "score": 90.0,
+          "strict": 90.0
+        },
+        "Structure nav": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Test strategy": {
+          "score": 88.0,
+          "strict": 88.0
+        },
+        "Type safety": {
+          "score": 88.0,
+          "strict": 88.0
+        }
+      }
+    }
+  ],
+  "review_cache": {
+    "detectors": {
+      "security": {
+        "version": 1,
+        "fingerprint": "9aaaaea7b3fae6b64490638210c794a26b1d4896",
+        "entries": [
+          {
+            "file": "auth-proxy/server.py",
+            "name": "security::B104::auth-proxy/server.py::540",
+            "tier": 3,
+            "confidence": "medium",
+            "summary": "[B104] Possible binding to all interfaces.",
+            "detail": {
+              "kind": "B104",
+              "severity": "medium",
+              "line": 540,
+              "content": "539 \n540     web.run_app(app, host='0.0.0.0', port=PORT, ssl_context=ssl_context)\n",
+              "remediation": "https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html",
+              "test_name": "hardcoded_bind_all_interfaces",
+              "source": "bandit"
+            }
+          }
+        ],
+        "files_scanned": 18,
+        "coverage": null
+      }
+    },
+    "files": {},
+    "holistic": {
+      "reviewed_at": "2026-04-12T08:43:36+00:00",
+      "file_count_at_review": 18,
+      "issue_count": 3
+    }
+  },
+  "lang_capabilities": {
+    "python": {
+      "fixers": [],
+      "typecheck_cmd": ""
+    }
+  },
+  "zone_distribution": {
+    "production": 5,
+    "config": 1,
+    "script": 2,
+    "test": 10
+  },
+  "tool_hash": "141ace7b12db",
+  "scan_path": ".",
+  "scan_completeness": {
+    "python": "fast"
+  },
+  "potentials": {
+    "python": {
+      "unused": 7,
+      "structural": 7,
+      "flat_dirs": 3,
+      "props": 0,
+      "responsibility_cohesion": 0,
+      "single_use": 0,
+      "cycles": 7,
+      "orphaned": 7,
+      "facade": 7,
+      "coupling": 0,
+      "uncalled_functions": 0,
+      "test_coverage": 129,
+      "smells": 7,
+      "global_mutable_config": 7,
+      "security": 18,
+      "private_imports": 7,
+      "dict_keys": 7,
+      "unused_enums": 7,
+      "advocacy_language": 0,
+      "advocacy_security": 7,
+      "advocacy_tool_presence": 0,
+      "stale_wontfix": 0
+    }
+  },
+  "codebase_metrics": {
+    "python": {
+      "total_files": 18,
+      "total_loc": 4574,
+      "total_directories": 3
+    }
+  },
+  "dimension_scores": {
+    "Code quality": {
+      "score": 54.8,
+      "strict": 54.8,
+      "verified_strict_score": 54.8,
+      "checks": 52,
+      "failing": 48,
+      "tier": 3,
+      "detectors": {
+        "unused": {
+          "potential": 7,
+          "pass_rate": 0.8571428571428571,
+          "failing": 1,
+          "weighted_failures": 1.0
+        },
+        "smells": {
+          "potential": 7,
+          "pass_rate": 0.0,
+          "failing": 25,
+          "weighted_failures": 9.0
+        },
+        "orphaned": {
+          "potential": 7,
+          "pass_rate": 0.5,
+          "failing": 5,
+          "weighted_failures": 3.5
+        },
+        "flat_dirs": {
+          "potential": 3,
+          "pass_rate": 1.0,
+          "failing": 0,
+          "weighted_failures": 0.0
+        },
+        "facade": {
+          "potential": 7,
+          "pass_rate": 1.0,
+          "failing": 0,
+          "weighted_failures": 0.0
+        },
+        "dict_keys": {
+          "potential": 7,
+          "pass_rate": 0.5714285714285714,
+          "failing": 7,
+          "weighted_failures": 3.0
+        },
+        "global_mutable_config": {
+          "potential": 7,
+          "pass_rate": 0.0,
+          "failing": 10,
+          "weighted_failures": 7.000000000000001
+        },
+        "private_imports": {
+          "potential": 7,
+          "pass_rate": 1.0,
+          "failing": 0,
+          "weighted_failures": 0.0
+        }
+      }
+    },
+    "Security": {
+      "score": 94.4,
+      "strict": 94.4,
+      "verified_strict_score": 94.4,
+      "checks": 25,
+      "failing": 2,
+      "tier": 4,
+      "detectors": {
+        "cycles": {
+          "potential": 7,
+          "pass_rate": 1.0,
+          "failing": 0,
+          "weighted_failures": 0.0
+        },
+        "security": {
+          "potential": 18,
+          "pass_rate": 0.9222222222222223,
+          "failing": 2,
+          "weighted_failures": 1.4
+        }
+      }
+    },
+    "File health": {
+      "score": 80.0,
+      "strict": 80.0,
+      "verified_strict_score": 80.0,
+      "checks": 7,
+      "failing": 2,
+      "tier": 3,
+      "detectors": {
+        "structural": {
+          "potential": 7,
+          "pass_rate": 0.7999999999999999,
+          "failing": 2,
+          "weighted_failures": 1.4
+        }
+      }
+    },
+    "Test health": {
+      "score": 73.3,
+      "strict": 73.3,
+      "verified_strict_score": 73.3,
+      "checks": 129,
+      "failing": 3,
+      "tier": 4,
+      "detectors": {
+        "test_coverage": {
+          "potential": 129,
+          "pass_rate": 0.7331622070488942,
+          "failing": 3,
+          "weighted_failures": 34.42207529069264
+        }
+      }
+    },
+    "Advocacy security": {
+      "score": 100.0,
+      "strict": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 7,
+      "failing": 0,
+      "tier": 2,
+      "detectors": {
+        "advocacy_security": {
+          "potential": 7,
+          "pass_rate": 1.0,
+          "failing": 0,
+          "weighted_failures": 0.0
+        }
+      }
+    },
+    "Abstraction fit": {
+      "score": 88.0,
+      "strict": 88.0,
+      "verified_strict_score": 88.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.88,
+          "failing": 0,
+          "weighted_failures": 1.2,
+          "assessment_score": 88.0,
+          "placeholder": false,
+          "dimension_key": "abstraction_fitness",
+          "configured_weight": 8.0,
+          "components": []
+        }
+      }
+    },
+    "Data sovereignty": {
+      "score": 95.0,
+      "strict": 95.0,
+      "verified_strict_score": 95.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.95,
+          "failing": 0,
+          "weighted_failures": 0.5,
+          "assessment_score": 95.0,
+          "placeholder": false,
+          "dimension_key": "advocacy_data_sovereignty",
+          "configured_weight": 6.0,
+          "components": []
+        }
+      }
+    },
+    "Advocacy language": {
+      "score": 90.0,
+      "strict": 90.0,
+      "verified_strict_score": 90.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.9,
+          "failing": 0,
+          "weighted_failures": 1.0,
+          "assessment_score": 90.0,
+          "placeholder": false,
+          "dimension_key": "advocacy_language_quality",
+          "configured_weight": 8.0,
+          "components": []
+        }
+      }
+    },
+    "Advocacy security (subjective)": {
+      "score": 96.0,
+      "strict": 96.0,
+      "verified_strict_score": 96.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.96,
+          "failing": 0,
+          "weighted_failures": 0.4,
+          "assessment_score": 96.0,
+          "placeholder": false,
+          "dimension_key": "advocacy_security_posture",
+          "configured_weight": 10.0,
+          "components": []
+        }
+      }
+    },
+    "Advocacy terminology": {
+      "score": 85.0,
+      "strict": 85.0,
+      "verified_strict_score": 85.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.85,
+          "failing": 0,
+          "weighted_failures": 1.5,
+          "assessment_score": 85.0,
+          "placeholder": false,
+          "dimension_key": "advocacy_terminology_consistency",
+          "configured_weight": 4.0,
+          "components": []
+        }
+      }
+    },
+    "Advocacy tools": {
+      "score": 90.0,
+      "strict": 90.0,
+      "verified_strict_score": 90.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.9,
+          "failing": 0,
+          "weighted_failures": 1.0,
+          "assessment_score": 90.0,
+          "placeholder": false,
+          "dimension_key": "advocacy_tool_integration",
+          "configured_weight": 3.0,
+          "components": []
+        }
+      }
+    },
+    "Advocacy UX": {
+      "score": 82.0,
+      "strict": 82.0,
+      "verified_strict_score": 82.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.82,
+          "failing": 0,
+          "weighted_failures": 1.8,
+          "assessment_score": 82.0,
+          "placeholder": false,
+          "dimension_key": "advocacy_ux_inclusivity",
+          "configured_weight": 4.0,
+          "components": []
+        }
+      }
+    },
+    "AI generated debt": {
+      "score": 82.0,
+      "strict": 82.0,
+      "verified_strict_score": 82.0,
+      "checks": 10,
+      "failing": 1,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.82,
+          "failing": 1,
+          "weighted_failures": 1.8,
+          "assessment_score": 82.0,
+          "placeholder": false,
+          "dimension_key": "ai_generated_debt",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      }
+    },
+    "API coherence": {
+      "score": 92.0,
+      "strict": 92.0,
+      "verified_strict_score": 92.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.92,
+          "failing": 0,
+          "weighted_failures": 0.8,
+          "assessment_score": 92.0,
+          "placeholder": false,
+          "dimension_key": "api_surface_coherence",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      }
+    },
+    "Auth consistency": {
+      "score": 94.0,
+      "strict": 94.0,
+      "verified_strict_score": 94.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.94,
+          "failing": 0,
+          "weighted_failures": 0.6,
+          "assessment_score": 94.0,
+          "placeholder": false,
+          "dimension_key": "authorization_consistency",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      }
+    },
+    "Contracts": {
+      "score": 91.0,
+      "strict": 91.0,
+      "verified_strict_score": 91.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.91,
+          "failing": 0,
+          "weighted_failures": 0.9,
+          "assessment_score": 91.0,
+          "placeholder": false,
+          "dimension_key": "contract_coherence",
+          "configured_weight": 12.0,
+          "components": []
+        }
+      }
+    },
+    "Convention drift": {
+      "score": 90.0,
+      "strict": 90.0,
+      "verified_strict_score": 90.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.9,
+          "failing": 0,
+          "weighted_failures": 1.0,
+          "assessment_score": 90.0,
+          "placeholder": false,
+          "dimension_key": "convention_outlier",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      }
+    },
+    "Cross-module arch": {
+      "score": 88.0,
+      "strict": 88.0,
+      "verified_strict_score": 88.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.88,
+          "failing": 0,
+          "weighted_failures": 1.2,
+          "assessment_score": 88.0,
+          "placeholder": false,
+          "dimension_key": "cross_module_architecture",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      }
+    },
+    "Dep health": {
+      "score": 87.0,
+      "strict": 87.0,
+      "verified_strict_score": 87.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.87,
+          "failing": 0,
+          "weighted_failures": 1.3,
+          "assessment_score": 87.0,
+          "placeholder": false,
+          "dimension_key": "dependency_health",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      }
+    },
+    "Design coherence": {
+      "score": 90.0,
+      "strict": 90.0,
+      "verified_strict_score": 90.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.9,
+          "failing": 0,
+          "weighted_failures": 1.0,
+          "assessment_score": 90.0,
+          "placeholder": false,
+          "dimension_key": "design_coherence",
+          "configured_weight": 10.0,
+          "components": []
+        }
+      }
+    },
+    "Error consistency": {
+      "score": 85.0,
+      "strict": 85.0,
+      "verified_strict_score": 85.0,
+      "checks": 10,
+      "failing": 1,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.85,
+          "failing": 1,
+          "weighted_failures": 1.5,
+          "assessment_score": 85.0,
+          "placeholder": false,
+          "dimension_key": "error_consistency",
+          "configured_weight": 3.0,
+          "components": []
+        }
+      }
+    },
+    "High elegance": {
+      "score": 88.0,
+      "strict": 88.0,
+      "verified_strict_score": 88.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.88,
+          "failing": 0,
+          "weighted_failures": 1.2,
+          "assessment_score": 88.0,
+          "placeholder": false,
+          "dimension_key": "high_level_elegance",
+          "configured_weight": 22.0,
+          "components": []
+        }
+      }
+    },
+    "Stale migration": {
+      "score": 88.0,
+      "strict": 88.0,
+      "verified_strict_score": 88.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.88,
+          "failing": 0,
+          "weighted_failures": 1.2,
+          "assessment_score": 88.0,
+          "placeholder": false,
+          "dimension_key": "incomplete_migration",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      }
+    },
+    "Init coupling": {
+      "score": 86.0,
+      "strict": 86.0,
+      "verified_strict_score": 86.0,
+      "checks": 10,
+      "failing": 1,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.86,
+          "failing": 1,
+          "weighted_failures": 1.4,
+          "assessment_score": 86.0,
+          "placeholder": false,
+          "dimension_key": "initialization_coupling",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      }
+    },
+    "Logic clarity": {
+      "score": 90.0,
+      "strict": 90.0,
+      "verified_strict_score": 90.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.9,
+          "failing": 0,
+          "weighted_failures": 1.0,
+          "assessment_score": 90.0,
+          "placeholder": false,
+          "dimension_key": "logic_clarity",
+          "configured_weight": 6.0,
+          "components": []
+        }
+      }
+    },
+    "Low elegance": {
+      "score": 89.0,
+      "strict": 89.0,
+      "verified_strict_score": 89.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.89,
+          "failing": 0,
+          "weighted_failures": 1.1,
+          "assessment_score": 89.0,
+          "placeholder": false,
+          "dimension_key": "low_level_elegance",
+          "configured_weight": 12.0,
+          "components": []
+        }
+      }
+    },
+    "Mid elegance": {
+      "score": 90.0,
+      "strict": 90.0,
+      "verified_strict_score": 90.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.9,
+          "failing": 0,
+          "weighted_failures": 1.0,
+          "assessment_score": 90.0,
+          "placeholder": false,
+          "dimension_key": "mid_level_elegance",
+          "configured_weight": 22.0,
+          "components": []
+        }
+      }
+    },
+    "Naming quality": {
+      "score": 90.0,
+      "strict": 90.0,
+      "verified_strict_score": 90.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.9,
+          "failing": 0,
+          "weighted_failures": 1.0,
+          "assessment_score": 90.0,
+          "placeholder": false,
+          "dimension_key": "naming_quality",
+          "configured_weight": 2.0,
+          "components": []
+        }
+      }
+    },
+    "Structure nav": {
+      "score": 88.0,
+      "strict": 88.0,
+      "verified_strict_score": 88.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.88,
+          "failing": 0,
+          "weighted_failures": 1.2,
+          "assessment_score": 88.0,
+          "placeholder": false,
+          "dimension_key": "package_organization",
+          "configured_weight": 5.0,
+          "components": []
+        }
+      }
+    },
+    "Test strategy": {
+      "score": 88.0,
+      "strict": 88.0,
+      "verified_strict_score": 88.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.88,
+          "failing": 0,
+          "weighted_failures": 1.2,
+          "assessment_score": 88.0,
+          "placeholder": false,
+          "dimension_key": "test_strategy",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      }
+    },
+    "Type safety": {
+      "score": 88.0,
+      "strict": 88.0,
+      "verified_strict_score": 88.0,
+      "checks": 10,
+      "failing": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 0.88,
+          "failing": 0,
+          "weighted_failures": 1.2,
+          "assessment_score": 88.0,
+          "placeholder": false,
+          "dimension_key": "type_safety",
+          "configured_weight": 12.0,
+          "components": []
+        }
+      }
+    }
+  },
+  "reminder_history": {
+    "zone_classification": 3,
+    "report_scores": 6,
+    "feedback_nudge": 3,
+    "stagnant_nudge": 30,
+    "review_issues_pending": 2,
+    "review_not_run": 2
+  },
+  "attestation_log": [
+    {
+      "timestamp": "2026-04-12T07:42:30+00:00",
+      "command": "suppress",
+      "pattern": "orphaned::auth-proxy/admin.py",
+      "attestation": "I have actually verified this is an entry point (admin web UI) and I am not gaming the score by resolving without fixing.",
+      "affected": 1
+    },
+    {
+      "timestamp": "2026-04-12T07:42:30+00:00",
+      "command": "suppress",
+      "pattern": "orphaned::auth-proxy/key_manager.py",
+      "attestation": "I have actually verified this is a standalone module imported at runtime and I am not gaming the score by resolving without fixing.",
+      "affected": 1
+    },
+    {
+      "timestamp": "2026-04-12T07:42:30+00:00",
+      "command": "suppress",
+      "pattern": "orphaned::auth-proxy/server.py",
+      "attestation": "I have actually verified this is the main server entry point and I am not gaming the score by resolving without fixing.",
+      "affected": 1
+    },
+    {
+      "timestamp": "2026-04-12T07:42:30+00:00",
+      "command": "suppress",
+      "pattern": "orphaned::auth-proxy/usage_tracker.py",
+      "attestation": "I have actually verified this is a standalone tracker module and I am not gaming the score by resolving without fixing.",
+      "affected": 1
+    },
+    {
+      "timestamp": "2026-04-12T07:42:30+00:00",
+      "command": "suppress",
+      "pattern": "orphaned::auth-proxy/utils.py",
+      "attestation": "I have actually verified this is a shared utilities module and I am not gaming the score by resolving without fixing.",
+      "affected": 1
+    }
+  ],
+  "assessment_import_audit": [
+    {
+      "timestamp": "2026-04-12T08:43:36+00:00",
+      "mode": "manual_override",
+      "trusted": false,
+      "reason": "manual override attested by operator",
+      "override_used": true,
+      "attested_external": false,
+      "provisional": true,
+      "provisional_count": 26,
+      "attest": "AI holistic review",
+      "import_file": "/tmp/privatemode-proxy-scores.json",
+      "packet_sha256": ""
+    }
+  ]
+}
