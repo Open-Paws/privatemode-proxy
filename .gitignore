@@ -94,3 +94,10 @@ build/
 # Claude Code
 # ===================
 .claude/
+
+# ===================
+# Desloppify
+# ===================
+# State files are local only; config.json (suppressions) is tracked
+.desloppify/
+!.desloppify/config.json

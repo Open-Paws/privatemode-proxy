@@ -4,15 +4,12 @@ Integration tests for HTTP endpoints using aiohttp test client.
 Tests the full request/response cycle through middleware and handlers.
 """
 
-import json
 import os
 import sys
-import time
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from aiohttp import web
-from aiohttp.test_utils import AioHTTPTestCase, TestClient, TestServer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'auth-proxy'))
 
