@@ -2,7 +2,6 @@
 Tests for admin UI: authentication, session management, key CRUD, rate limit settings.
 """
 
-import json
 import os
 import sys
 import time

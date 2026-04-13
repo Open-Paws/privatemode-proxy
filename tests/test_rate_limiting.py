@@ -5,7 +5,7 @@ Tests for rate limiting: global, per-key, and per-IP rate limits.
 import os
 import sys
 import time
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 

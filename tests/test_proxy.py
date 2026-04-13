@@ -5,11 +5,7 @@ Tests for proxy behavior: request forwarding, response handling, error cases.
 import json
 import os
 import sys
-from unittest.mock import AsyncMock, patch, MagicMock
 
-import pytest
-from aiohttp import web
-from aiohttp.test_utils import AioHTTPTestCase
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'auth-proxy'))
 

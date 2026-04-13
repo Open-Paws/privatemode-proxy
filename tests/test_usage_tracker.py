@@ -10,7 +10,7 @@ import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'auth-proxy'))
 
-from usage_tracker import UsageTracker, get_time_range, PRICING
+from usage_tracker import UsageTracker, get_time_range
 
 
 class TestCostCalculation:
