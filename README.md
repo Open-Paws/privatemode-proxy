@@ -1,181 +1,143 @@
-# Privatemode Auth Proxy for Confidential Computing
+# privatemode-proxy
 
-An OpenAI-compatible API proxy for [Privatemode](https://privatemode.ai) that runs on Azure Confidential Computing. This gives you a web-accessible endpoint for end-to-end encrypted AI - no local software required.
+> **Status: 🟢 Production** — 5 models live, 116 tests, desloppify score 85.5/100
+>
+> Part of the [Open Paws](https://github.com/Open-Paws) animal advocacy technology ecosystem.
+> This is the **Tier 3 AI processing endpoint** — the mandatory route for sensitive investigation data, witness testimony, and legal defense materials.
 
-## Why Use This?
+An OpenAI-compatible API proxy for [Privatemode](https://privatemode.ai) that runs inside an **Azure Confidential VM** with AMD SEV-SNP hardware encryption. Provides a web-accessible, zero-retention AI endpoint — no local software required on the client side.
 
-### The Problem with Privatemode's Default Setup
+---
 
-Privatemode provides end-to-end encrypted AI, but their standard setup requires running a local proxy on your machine. This works great for local development, but breaks down when:
+## Why This Exists: AI Privacy for High-Risk Advocacy
 
-- **You're using hosted automation tools** like n8n, Zapier, Make, or Pipedream - you can't install software on their servers
-- **You're building web apps** where users need AI access from their browsers
-- **You're on mobile or a locked-down machine** where you can't run the local proxy
-- **You want a team endpoint** instead of everyone running their own proxy
+Animal advocacy investigations involve data that is routinely targeted by state surveillance, corporate infiltration, and legal discovery. Undercover investigation documentation, witness identities, and legal defense strategy are all examples of **Tier 3 data** in the Open Paws security model — information that must never be processed by AI providers who retain input data.
 
-### The Solution: A Cloud Proxy in a Confidential VM
+Standard cloud AI APIs (OpenAI, Anthropic, Google) retain prompts for abuse monitoring, model training, or legal compliance. For activists and investigators, this creates three direct threats:
 
-This project deploys Privatemode's proxy to a cloud server, but with a critical difference: it runs inside an **Azure Confidential VM** with AMD SEV-SNP hardware encryption. This means:
+1. **State surveillance** — ag-gag law enforcement can subpoena AI provider logs to identify investigation targets and undercover personnel
+2. **Industry infiltration** — corporate investigators can obtain AI conversation logs through legal channels to expose campaign strategy
+3. **AI model bias** — even providers with retention policies can expose data through model training or telemetry
 
-1. **Your prompts stay encrypted** - even Azure can't see them
-2. **Works with any HTTP client** - n8n, Zapier, curl, browsers, anything
-3. **One endpoint for your whole team** - manage access with API keys
-4. **OpenAI-compatible API** - drop-in replacement, just change the base URL
+This proxy routes all requests through [Privatemode](https://privatemode.ai), whose servers run inside a **Trusted Execution Environment (TEE)** — a hardware-isolated enclave where even Privatemode's own infrastructure cannot read the data being processed. Combined with Azure Confidential Computing for the proxy itself, the entire path from client to AI model is end-to-end encrypted.
 
-### Example: Using with n8n
+**The practical result:** An activist documenting a factory farm investigation can use AI tools with the same privacy guarantees as an encrypted messaging app. No logs. No retention. No exposure.
 
-In n8n, you'd normally use the OpenAI node. To use Privatemode instead:
+---
 
-1. Deploy this proxy (instructions below)
-2. In n8n, add an "OpenAI" credential
-3. Set the base URL to `https://your-proxy-domain.com/v1`
-4. Use an API key from your proxy's admin panel
+## How It Works
 
-That's it. All your n8n AI workflows now use end-to-end encrypted AI.
-
-### Example: Using with Any OpenAI SDK
-
-```python
-from openai import OpenAI
-
-# Just change the base_url and api_key
-client = OpenAI(
-    base_url="https://your-proxy-domain.com/v1",
-    api_key="your-proxy-api-key"  # NOT your OpenAI key
-)
-
-# Everything else works exactly the same
-response = client.chat.completions.create(
-    model="gpt-oss-120b",
-    messages=[{"role": "user", "content": "Hello!"}]
-)
-```
-
-## Why Confidential Computing?
-
-When you run a normal VM in the cloud, the cloud provider has theoretical access to:
-- Your VM's memory (where secrets and decrypted data live)
-- Your disk contents
-- Network traffic before/after TLS termination
-
-**Azure Confidential VMs with AMD SEV-SNP change this.** The CPU encrypts all VM memory with keys that Azure cannot access. This means:
-- Your TLS private keys are never visible to Azure
-- API requests are decrypted only inside the protected memory
-- Your Privatemode API key stays encrypted in memory
-
-## How the Encryption Works
+The proxy runs two processes in a single Docker container, managed by supervisord:
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        Azure Confidential VM (AMD SEV-SNP)                  │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                    Hardware-Encrypted Memory                          │  │
-│  │                    (Azure CANNOT access this)                         │  │
-│  │                                                                       │  │
-│  │   ┌────────────────┐         ┌──────────────────────┐                │  │
-│  │   │   Auth Proxy   │────────▶│  Privatemode Proxy   │───────────────────▶ Privatemode API
-│  │   │   (TLS Here)   │         │                      │                │  │  (E2E Encrypted)
-│  │   └────────────────┘         └──────────────────────┘                │  │
-│  │         ▲                                                             │  │
-│  │         │ TLS decryption happens HERE,                               │  │
-│  │         │ inside encrypted memory                                    │  │
-│  └─────────│─────────────────────────────────────────────────────────────┘  │
-└────────────│────────────────────────────────────────────────────────────────┘
-             │
-    ┌────────┴────────┐
-    │     Client      │
-    │  (Your API Key) │
-    └─────────────────┘
+Client
+  |
+  | HTTPS (TLS terminates inside TEE — Azure cannot read)
+  v
+auth-proxy  (Python/aiohttp, port 8080)
+  |  - TLS termination
+  |  - Bearer token authentication
+  |  - Per-key and per-IP rate limiting
+  |  - Usage tracking (token counts only — content never logged)
+  |  - Admin web UI
+  v
+privatemode-proxy  (official Privatemode binary, port 8081)
+  |
+  | E2E encrypted channel to Privatemode TEE
+  v
+Privatemode API  (Trusted Execution Environment)
+  |
+  v
+AI model (gpt-oss-120b, gemma-3-27b, qwen3-coder-30b-a3b,
+          qwen3-embedding-4b, whisper-large-v3)
 ```
 
-**Key security properties:**
-1. TLS terminates inside the TEE - Azure never sees decrypted traffic
-2. Your Privatemode API key lives only in encrypted memory
-3. SSH keys are generated locally - Azure never has the private key
-4. Let's Encrypt certificates are generated on the VM - private key never leaves the TEE
+The key security property: **TLS terminates inside the AMD SEV-SNP encrypted memory**. Azure's hypervisor and infrastructure staff cannot access the decrypted traffic, TLS private keys, or API secrets — the CPU hardware enforces this isolation.
 
-## What is End-to-End Encrypted AI?
+### What Azure Confidential Computing Provides
 
-When you send a prompt through this proxy, it goes to Privatemode's servers which run inside a special secure environment called a **Trusted Execution Environment (TEE)**.
+A standard cloud VM gives the cloud provider theoretical access to VM memory (where secrets live), disk contents, and decrypted network traffic. Azure Confidential VMs with **AMD SEV-SNP** (Secure Encrypted Virtualization - Secure Nested Paging) change this:
 
-Think of a TEE like a locked box that even the server owner can't open. Your prompts and the AI's responses are encrypted inside this box - **nobody can see your data**, not even Privatemode themselves.
+- The CPU encrypts all VM memory using keys generated inside the CPU and never exported
+- Azure's hypervisor, storage infrastructure, and personnel cannot read the encrypted memory
+- TLS private keys, the Privatemode API key, and all decrypted request content exist only inside this encrypted memory space
+- The vTPM and Secure Boot chain verify the boot environment before any sensitive keys are loaded
 
-- Your prompts are never logged
-- Your data is never used for training
-- Fully GDPR compliant
+This is the same technology class used by confidential computing for healthcare data (HIPAA), financial processing, and enterprise secrets management — applied here to protect investigation data and activist identities.
 
-## How Requests Flow Through the System
+### Zero-Retention Architecture
 
-Here's what happens when your application makes an API request:
-
-1. **Your app sends a request** to this proxy (e.g., `POST /v1/chat/completions`)
-2. **The proxy validates your API key** and checks rate limits
-3. **The request is forwarded** to Privatemode's encrypted servers
-4. **The AI model processes your request** inside the secure TEE
-5. **The response comes back** through the proxy to your app
-
-The entire chain is encrypted. Your prompts never exist in plaintext outside of the TEE.
-
-## How We Track Usage Without Breaking Privacy
-
-You might wonder: if everything is encrypted, how do we track token usage?
-
-The answer is that **we only read the usage metadata** from the response - specifically the `usage` field that contains token counts. We never read, store, or log the actual prompt or response content.
+Prompts and responses are never written to disk or any log stream. The proxy reads only the `usage` field from Privatemode's responses (token counts for billing attribution) and discards the `choices` field entirely:
 
 ```json
 {
-  "choices": [...],           // We ignore this - your actual content
+  "choices": [...],          // ignored — your actual conversation content
   "usage": {
-    "prompt_tokens": 25,      // We read this for billing
-    "completion_tokens": 150, // We read this for billing
-    "total_tokens": 175       // We read this for billing
+    "prompt_tokens": 25,     // recorded for cost tracking
+    "completion_tokens": 150,
+    "total_tokens": 175
   }
 }
 ```
 
-This means we can tell you how many tokens you used and calculate costs, but we have no idea what you actually asked the AI or what it responded with. Your conversations remain completely private.
+Usage data is stored as aggregate counts per API key. No conversation content, no request bodies, no IP-to-content associations are retained.
 
-## Available API Endpoints
+---
 
-This proxy supports the same endpoints as the OpenAI API. All endpoints require authentication via the `Authorization: Bearer YOUR_KEY` header.
+## OpenAI Compatibility
+
+The proxy implements the OpenAI API surface. Any client that supports a custom `base_url` works without code changes:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://your-proxy-domain.com/v1",
+    api_key="your-proxy-api-key"  # managed in the admin UI
+)
+
+response = client.chat.completions.create(
+    model="gpt-oss-120b",
+    messages=[{"role": "user", "content": "Summarize this investigation report."}]
+)
+```
+
+This means existing integrations with n8n, Zapier, Make, Pipedream, LangChain, LlamaIndex, and any other OpenAI-compatible tooling work by changing only the `base_url` and API key — no other modifications required.
+
+---
+
+## API Endpoints
+
+All endpoints require `Authorization: Bearer YOUR_KEY` except `/health`.
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/v1/chat/completions` | Chat with AI models |
-| `POST` | `/v1/embeddings` | Generate text embeddings for search/RAG |
-| `POST` | `/v1/audio/transcriptions` | Convert audio to text (Whisper) |
+| `POST` | `/v1/embeddings` | Generate text embeddings (RAG, semantic search) |
+| `POST` | `/v1/audio/transcriptions` | Speech-to-text via Whisper |
 | `GET` | `/v1/models` | List available models |
 | `GET` | `/health` | Health check (no auth required) |
+| `GET` | `/admin` | Admin web UI (password auth) |
 
 ## Available Models
 
-| Model | Type | Description |
-|-------|------|-------------|
+| Model ID | Type | Description |
+|----------|------|-------------|
 | `gpt-oss-120b` | Chat | Large general-purpose model |
 | `gemma-3-27b` | Chat | Google's Gemma 3 27B |
 | `qwen3-coder-30b-a3b` | Chat | Optimized for code generation |
-| `qwen3-embedding-4b` | Embeddings | For vector search, RAG, semantic similarity |
+| `qwen3-embedding-4b` | Embeddings | Vector search, RAG, semantic similarity |
 | `whisper-large-v3` | Audio | Speech-to-text transcription |
 
 ## Pricing
 
-All prices are in Euros. Usage is tracked in the admin panel.
+Prices are in Euros. Usage is tracked per API key in the admin panel.
 
-| Model Type | Price |
-|------------|-------|
-| Chat Models (gpt-oss-120b, gemma-3-27b, qwen3-coder) | €5.00 per 1M tokens |
-| Text Embeddings (qwen3-embedding-4b) | €0.13 per 1M tokens |
-| Speech to Text (whisper-large-v3) | €0.096 per megabyte |
-
-## Features
-
-- **End-to-End Encryption**: TLS termination inside the TEE
-- **API Key Authentication**: Manage access with your own API keys
-- **Admin Web UI**: Browser-based key management and usage monitoring
-- **Rate Limiting**: Per-key and global rate limiting
-- **Usage Tracking**: Token usage and cost tracking per API key
-- **Hot Reload**: Zero-downtime key rotation
-- **Non-root Container**: Runs as unprivileged user
+| Type | Price |
+|------|-------|
+| Chat models (`gpt-oss-120b`, `gemma-3-27b`, `qwen3-coder`) | €5.00 per 1M tokens |
+| Embeddings (`qwen3-embedding-4b`) | €0.13 per 1M tokens |
+| Speech-to-text (`whisper-large-v3`) | €0.096 per megabyte |
 
 ---
 
@@ -186,39 +148,32 @@ All prices are in Euros. Usage is tracked in the admin panel.
 - Azure subscription with Confidential VM quota
 - Azure CLI installed (`brew install azure-cli` on macOS)
 - A domain name you control (for TLS certificates)
-- SSH key pair (we'll generate this locally for security)
+- SSH key pair — **generate locally, never in Azure**
 
 ### Step 1: Generate SSH Keys Locally
-
-**Important**: Generate SSH keys on your local machine, not in Azure. This ensures Azure never has access to your private key.
 
 ```bash
 ssh-keygen -t ed25519 -f ~/.ssh/azure-privatemode -C "privatemode-cvm" -N ""
 ```
 
-This creates:
-- `~/.ssh/azure-privatemode` - Private key (keep this safe, never share)
-- `~/.ssh/azure-privatemode.pub` - Public key (this goes to Azure)
+This creates `~/.ssh/azure-privatemode` (private key, never share) and `~/.ssh/azure-privatemode.pub` (public key for Azure).
 
 ### Step 2: Login to Azure
 
 ```bash
 az login
-az account show  # Verify your subscription
+az account show  # verify your subscription
 ```
 
 ### Step 3: Create Resource Group
 
-Choose a region that supports AMD SEV-SNP confidential VMs:
-- `eastus`, `westus`, `westeurope`, `northeurope`
+Choose a region with AMD SEV-SNP support: `eastus`, `westus`, `westeurope`, `northeurope`.
 
 ```bash
 az group create --name privatemode-rg --location eastus
 ```
 
 ### Step 4: Create the Confidential VM
-
-This creates a VM with AMD SEV-SNP memory encryption:
 
 ```bash
 az vm create \
@@ -235,14 +190,15 @@ az vm create \
   --public-ip-sku Standard
 ```
 
-Note the `publicIpAddress` in the output - you'll need this for DNS.
+Note the `publicIpAddress` in the output — you need this for DNS.
 
-**VM Size Options:**
-| Size | vCPUs | RAM | Use Case |
-|------|-------|-----|----------|
-| Standard_DC2as_v5 | 2 | 8GB | Development/Testing |
-| Standard_DC4as_v5 | 4 | 16GB | Light Production |
-| Standard_DC8as_v5 | 8 | 32GB | Production |
+**VM size options:**
+
+| Size | vCPUs | RAM | Recommended for |
+|------|-------|-----|-----------------|
+| Standard_DC2as_v5 | 2 | 8 GB | Development / testing |
+| Standard_DC4as_v5 | 4 | 16 GB | Light production |
+| Standard_DC8as_v5 | 8 | 32 GB | Production |
 
 ### Step 5: Open Firewall Ports
 
@@ -251,30 +207,20 @@ az vm open-port --resource-group privatemode-rg --name privatemode-cvm --port 44
 az vm open-port --resource-group privatemode-rg --name privatemode-cvm --port 80 --priority 1020
 ```
 
-Port 80 is needed temporarily for Let's Encrypt certificate verification.
+Port 80 is needed temporarily for Let's Encrypt certificate verification only.
 
 ### Step 6: Configure DNS
 
-Add an A record pointing your domain to the VM's public IP:
+Add an A record pointing your domain to the VM's public IP. Verify propagation with `dig yourdomain.com` before proceeding.
 
-| Type | Name | Value |
-|------|------|-------|
-| A | `privatemode` | `<your-vm-public-ip>` |
-
-Wait for DNS propagation (check with `dig yourdomain.com`).
-
-### Step 7: Verify AMD SEV-SNP is Active
-
-SSH into the VM and verify confidential computing is enabled:
+### Step 7: Verify AMD SEV-SNP
 
 ```bash
 ssh -i ~/.ssh/azure-privatemode azureuser@<your-vm-ip>
-
-# Check AMD SEV-SNP status
 sudo dmesg | grep -i sev
 ```
 
-You should see:
+Expected output:
 ```
 Memory Encryption Features active: AMD SEV
 Detected confidential virtualization sev-snp
@@ -290,18 +236,12 @@ sudo usermod -aG docker azureuser
 
 ### Step 9: Get TLS Certificate
 
-Install Certbot and get a Let's Encrypt certificate:
-
 ```bash
 sudo apt-get install -y certbot
 sudo certbot certonly --standalone --non-interactive \
   --agree-tos --email your@email.com \
   -d yourdomain.com
-```
 
-Copy certificates to a directory for Docker:
-
-```bash
 mkdir -p ~/privatemode/certs
 sudo cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem ~/privatemode/certs/cert.pem
 sudo cp /etc/letsencrypt/live/yourdomain.com/privkey.pem ~/privatemode/certs/key.pem
@@ -309,8 +249,6 @@ sudo chown -R $USER:$USER ~/privatemode/certs
 ```
 
 ### Step 10: Prepare Configuration
-
-Create the secrets directory and API keys file:
 
 ```bash
 mkdir -p ~/privatemode/secrets ~/privatemode/data
@@ -334,17 +272,11 @@ EOF
 
 ### Step 11: Deploy the Container
 
-Copy the project files to the VM:
-
 ```bash
 # From your local machine
 scp -i ~/.ssh/azure-privatemode -r Dockerfile supervisord.conf auth-proxy \
   azureuser@<your-vm-ip>:~/privatemode/
-```
 
-Build and run:
-
-```bash
 # On the VM
 cd ~/privatemode
 sudo docker build -t privatemode-proxy:latest .
@@ -375,172 +307,225 @@ curl -H "Authorization: Bearer your-api-key" \
   https://yourdomain.com/v1/models
 ```
 
+Verify the attestation confirmation in container logs:
+
+```bash
+sudo docker logs -f privatemode
+```
+
+Look for: `level=INFO msg="Validate succeeded" validator.name=snp-0-GENOA`
+
+This confirms the workload is running in a genuine AMD SEV-SNP enclave.
+
+---
+
+## Local Development
+
+```bash
+# 1. Copy and configure environment
+cp .env.example .env
+# Edit .env: set ADMIN_PASSWORD and PRIVATEMODE_API_KEY
+
+# 2. Build the container
+docker build -t privatemode-proxy:latest .
+
+# 3. Run in HTTP mode (no TLS required for local dev)
+docker run -d --name privatemode \
+  -p 8080:8080 \
+  --env-file .env \
+  privatemode-proxy:latest
+
+# 4. Health check
+curl http://localhost:8080/health
+
+# 5. Run tests
+pip install -r requirements-test.txt
+pytest
+```
+
+---
+
 ## Configuration Reference
 
 ### Environment Variables
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `PRIVATEMODE_API_KEY` | Yes | - | Your Privatemode API key |
-| `ADMIN_PASSWORD` | Yes | - | Password for admin web UI |
+| `PRIVATEMODE_API_KEY` | Yes | — | Your Privatemode API key |
+| `ADMIN_PASSWORD` | Yes | — | Password for admin web UI |
 | `API_KEYS_FILE` | No | `/app/secrets/api_keys.json` | Path to API keys JSON |
-| `TLS_CERT_FILE` | No | - | Path to TLS certificate |
-| `TLS_KEY_FILE` | No | - | Path to TLS private key |
+| `TLS_CERT_FILE` | No | — | Path to TLS certificate (enables HTTPS when set) |
+| `TLS_KEY_FILE` | No | — | Path to TLS private key |
 | `FORCE_HTTPS` | No | `true` when TLS enabled | Reject non-HTTPS requests |
-| `TRUST_PROXY` | No | `false` | Trust X-Forwarded-* headers |
-| `RATE_LIMIT_REQUESTS` | No | `100` | Global rate limit (requests/window) |
-| `RATE_LIMIT_WINDOW` | No | `60` | Rate limit window (seconds) |
+| `TRUST_PROXY` | No | `false` | Trust `X-Forwarded-*` headers from a reverse proxy |
+| `RATE_LIMIT_REQUESTS` | No | `100` | Global rate limit (requests per window) |
+| `RATE_LIMIT_WINDOW` | No | `60` | Rate limit window in seconds |
 | `IP_RATE_LIMIT_REQUESTS` | No | `1000` | Per-IP rate limit |
-| `IP_RATE_LIMIT_WINDOW` | No | `60` | Per-IP rate limit window |
+| `IP_RATE_LIMIT_WINDOW` | No | `60` | Per-IP rate limit window in seconds |
+| `PORT` | No | `8080` | Port to listen on |
+| `UPSTREAM_URL` | No | `http://localhost:8081` | URL for Privatemode binary (supervisord sets this) |
 
-## Security Architecture
+---
+
+## Security Model
 
 ### What Azure Cannot Access
 
-With AMD SEV-SNP enabled:
+With AMD SEV-SNP enabled, the following are protected by hardware-enforced memory encryption:
 
-| Component | Protected? | Notes |
-|-----------|------------|-------|
-| VM Memory | Yes | Encrypted by CPU, Azure has no keys |
-| TLS Private Key | Yes | Lives only in encrypted memory |
-| Privatemode API Key | Yes | Passed via env, stays in encrypted memory |
-| SSH Private Key | Yes | Generated locally, never uploaded to Azure |
-| Decrypted API Traffic | Yes | TLS terminates inside TEE |
-| OS Disk (optional) | Yes | Can enable confidential disk encryption |
+| Component | Protected | Notes |
+|-----------|-----------|-------|
+| VM memory | Yes | CPU-encrypted, Azure has no keys |
+| TLS private key | Yes | Generated on VM, lives in encrypted memory only |
+| Privatemode API key | Yes | Passed via env var, stays in encrypted memory |
+| SSH private key | Yes | Generated locally, never uploaded to Azure |
+| Decrypted API traffic | Yes | TLS terminates inside the TEE |
+| OS disk (optional) | Yes | Enable with confidential disk encryption flag |
 
 ### What Azure Can Access
 
 | Component | Notes |
 |-----------|-------|
-| Encrypted network traffic | Before TLS termination |
-| VM metadata | Name, size, region, etc. |
-| Disk contents (if not using confidential disk) | At-rest encryption still applies |
-| Resource usage | CPU, memory, network metrics |
+| Encrypted network traffic | Before TLS termination at the VM NIC |
+| VM metadata | Name, size, region, resource group |
+| Disk contents | If confidential disk encryption is not enabled |
+| Resource metrics | CPU, memory, network usage aggregates |
 
-### Defense in Depth
+### Defense in Depth Layers
 
-1. **Hardware Layer**: AMD SEV-SNP encrypts all memory
-2. **OS Layer**: Ubuntu with secure boot and vTPM
-3. **Container Layer**: Non-root execution, minimal image
-4. **Application Layer**: HTTPS enforcement, rate limiting, auth
+1. **Hardware** — AMD SEV-SNP encrypts all VM memory at the CPU level
+2. **OS** — Ubuntu with Secure Boot and vTPM verify boot integrity
+3. **Container** — Non-root user (`appuser`, UID 1000), minimal Python 3.12-slim base
+4. **Application** — HTTPS enforcement, Bearer token auth, per-key and per-IP rate limiting
+5. **Key management** — Hot-reload key rotation, optional per-key expiration and rate limits
+
+### Zero-Retention Invariant
+
+This is a core security invariant, not a configuration option. The proxy must never write request content (the `choices` field) to any log, file, or external service. Only the `usage` field (token counts) is recorded for cost attribution per API key.
+
+Any PR that adds logging of request or response content is a Tier 3 security incident.
+
+---
+
+## Admin Panel
+
+Access at `https://yourdomain.com/admin` with your `ADMIN_PASSWORD`.
+
+**API Keys tab** — generate keys with optional expiration and per-key rate limits, view key status, revoke or delete keys instantly.
+
+**Settings tab** — verify Privatemode upstream connection, configure global and per-IP rate limits.
+
+**Usage & Costs tab** — total spend in Euros for any period, token usage broken down by API key and model, request counts.
+
+**Documentation tab** — in-app reference for encryption model, code examples, model and pricing reference.
+
+---
 
 ## Certificate Renewal
 
-Let's Encrypt certificates expire after 90 days. Set up auto-renewal:
+Let's Encrypt certificates expire after 90 days. The certbot systemd timer handles automatic renewal:
 
 ```bash
-# Test renewal
-sudo certbot renew --dry-run
-
-# The certbot systemd timer handles automatic renewal
 sudo systemctl status certbot.timer
-```
+sudo certbot renew --dry-run  # test renewal
 
-After renewal, copy the new certificates and restart the container:
-
-```bash
+# After renewal, copy new certificates and restart
 sudo cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem ~/privatemode/certs/cert.pem
 sudo cp /etc/letsencrypt/live/yourdomain.com/privkey.pem ~/privatemode/certs/key.pem
 sudo docker restart privatemode
 ```
 
-## Monitoring
+---
 
-### Container Logs
+## Troubleshooting
 
-```bash
-sudo docker logs -f privatemode
-```
+**"HTTPS required" error** — use `https://` in your URL. HTTP is rejected when TLS is enabled.
 
-### Verify SEV-SNP Attestation
+**Container won't start** — check logs: `sudo docker logs privatemode`
 
-The privatemode-proxy logs show attestation verification:
+**SEV-SNP not detected** — verify you used `--security-type ConfidentialVM` when creating the VM.
 
-```
-level=INFO msg="Validate succeeded" validator.name=snp-0-GENOA
-```
+**Certificate errors** — verify paths and file permissions: `ls -la ~/privatemode/certs/`
 
-This confirms the workload is running in a genuine AMD SEV-SNP enclave.
+**Rate limit exceeded** — check response headers for reset time, or adjust limits in admin UI.
+
+**Attestation failure in logs** — the VM may not have confidential computing enabled. Recreate with the correct flags.
+
+---
 
 ## Cleanup
-
-To delete all Azure resources:
 
 ```bash
 az group delete --name privatemode-rg --yes --no-wait
 ```
 
-## Troubleshooting
+---
 
-### "HTTPS required" error
-Use `https://` in your URL. HTTP is rejected by default.
-
-### Container won't start
-```bash
-sudo docker logs privatemode
-```
-
-### SEV-SNP not detected
-Ensure you used `--security-type ConfidentialVM` when creating the VM.
-
-### Certificate errors
-Verify certificate paths and that the files are readable:
-```bash
-ls -la ~/privatemode/certs/
-```
-
-### Rate limit exceeded
-Check headers for reset time, or adjust limits in admin UI.
-
-## Admin Panel
-
-Access the admin panel at `https://yourdomain.com/admin` using your `ADMIN_PASSWORD`.
-
-### API Keys Tab
-
-- **Generate new API keys** with optional expiration dates and rate limits
-- **View all keys** with their status (active, revoked, expired)
-- **Revoke or delete keys** instantly
-- **Set per-key rate limits** that override global defaults
-
-### Settings Tab
-
-- **Privatemode connection status** - verify your upstream API key is configured
-- **Global rate limits** - configure requests per minute across all keys
-- **Per-IP rate limits** - prevent abuse from individual IP addresses
-
-### Usage & Costs Tab
-
-- **Total spend** in Euros for any time period
-- **Token usage** broken down by API key and by model
-- **Request counts** to see which keys are most active
-
-### Documentation Tab
-
-- In-app documentation explaining how the encryption works
-- Code examples for Python and cURL
-- Model and pricing information
-
-## File Structure
+## Repository Structure
 
 ```
-privatemode/
-├── Dockerfile              # Multi-stage build
-├── supervisord.conf        # Process manager config
-├── README.md
+privatemode-proxy/
+├── Dockerfile              # Multi-stage: extracts Privatemode binary, Python 3.12-slim, non-root
+├── supervisord.conf        # Runs auth-proxy + privatemode-proxy in one container
+├── .env.example            # Environment variable template
+├── pytest.ini              # Test config (asyncio mode)
+├── requirements-test.txt   # Test dependencies (pytest, pytest-aiohttp, pytest-asyncio)
 ├── auth-proxy/
-│   ├── server.py           # Main proxy server
-│   ├── admin.py            # Admin UI
-│   ├── config.py           # Configuration
-│   ├── key_manager.py      # Key management
-│   ├── usage_tracker.py    # Usage tracking
-│   └── utils.py            # Utilities
+│   ├── server.py           # Main proxy — request routing, TLS, HTTPS enforcement
+│   ├── admin.py            # Admin web UI — key management, usage dashboard, settings
+│   ├── config.py           # Centralized configuration from environment variables
+│   ├── key_manager.py      # API key CRUD, validation, hot-reload from JSON
+│   ├── usage_tracker.py    # Token usage and cost tracking per key/model
+│   ├── utils.py            # Shared utilities
+│   ├── requirements.txt    # Runtime dependencies (aiohttp, cryptography)
+│   └── static/             # Admin UI static assets
+├── tests/
+│   ├── conftest.py         # pytest fixtures
+│   ├── helpers.py          # Test utilities
+│   ├── test_auth.py        # Authentication tests
+│   ├── test_admin.py       # Admin UI tests
+│   ├── test_endpoints.py   # API endpoint tests
+│   ├── test_proxy.py       # Proxy forwarding tests
+│   ├── test_rate_limiting.py
+│   └── test_usage_tracker.py
 ├── scripts/
-│   └── manage_keys.py      # Key management CLI
-├── secrets/                # Gitignored
-│   └── api_keys.json       # API keys storage
-└── docs/                   # Azure documentation
+│   ├── manage_keys.py      # CLI for API key management
+│   └── scrape_docs.py      # Scrapes Privatemode docs into docs/
+├── docs/                   # Scraped Privatemode docs + Azure deployment guide
+└── secrets/                # Gitignored — api_keys.json, settings.json
 ```
+
+---
+
+## Who Should Use This
+
+This proxy is intended for:
+
+- **Investigators and activists** who need AI assistance for investigation documentation, report drafting, or data analysis — where using a standard cloud AI API would expose sensitive content to data retention
+- **Campaigns** that use automated AI workflows (n8n, Zapier, Make) and need those workflows to use zero-retention AI
+- **Coalitions** building shared tooling where member organizations have strict data handling requirements
+- **Developers** in the Open Paws stack building features that process Tier 3 data (investigation documentation, witness identity data, legal defense materials)
+
+If you are processing data that could identify activists, document investigations, or support legal defense, route it through this proxy — not through any cloud AI provider with data retention.
+
+---
+
+## Contributing
+
+1. Read the existing code before writing anything new
+2. Write failing tests before implementing changes
+3. Run quality gates before submitting a PR:
+   ```bash
+   desloppify scan --path .   # minimum score ≥85
+   semgrep --config semgrep-no-animal-violence.yaml .
+   pytest
+   ```
+4. Security changes (auth, TLS, rate limiting, logging) require explicit security review in the PR — tag them clearly
+5. The zero-retention invariant is non-negotiable: no PR may add logging of request or response content
+
+See `CLAUDE.md` for the full development guide, architecture decisions, and organizational context.
+
+---
 
 ## License
 
