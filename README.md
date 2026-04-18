@@ -1,7 +1,7 @@
 [![Production](https://img.shields.io/badge/status-production-brightgreen)](https://github.com/Open-Paws/privatemode-proxy)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/)
-[![desloppify score](https://img.shields.io/badge/desloppify-85.5%2F100-brightgreen)](https://github.com/Open-Paws/desloppify)
+[![desloppify score](https://img.shields.io/badge/desloppify-87.6%2F100-brightgreen)](scorecard.png)
 [![Tests](https://img.shields.io/badge/tests-116%20passing-brightgreen)](tests/)
 [![Open Paws](https://img.shields.io/badge/Open%20Paws-ecosystem-orange)](https://openpaws.ai)
 
@@ -233,6 +233,10 @@ Access at `https://yourdomain.com/admin` with your `ADMIN_PASSWORD`.
 - **Documentation** — in-app reference for encryption model, code examples, model and pricing reference
 
 </details>
+
+## Code Quality
+
+<img src="scorecard.png" width="100%">
 
 ## Contributing
 
