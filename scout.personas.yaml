@@ -1,0 +1,221 @@
+version: "1"
+interaction: api
+# OpenAI-compatible API proxy running inside Azure Confidential VM (AMD SEV-SNP) providing zero-retention E2E encrypted inference
+
+personas:
+  - id: investigation-tool
+    name: Investigation Tool — Sensitive Content Caller
+    description: >
+      An automated tool processing Tier 3 advocacy data: investigation
+      documentation, witness testimony, or legal defense materials. Sends
+      prompts that must never appear in server logs or upstream retention
+      stores. Verifies that the zero-retention invariant is enforced and
+      that privacy-confirming response headers are present.
+    environment:
+      runtime: docker
+      os: linux
+    flows:
+      - id: chat-completion-sensitive
+        name: Sensitive chat completion request
+        steps:
+          - request: POST /v1/chat/completions
+            headers:
+              Authorization: "Bearer <valid-proxy-key>"
+              Content-Type: application/json
+            body: |
+              {
+                "model": "gpt-oss-120b",
+                "messages": [
+                  {"role": "user", "content": "Summarise the following field notes: <REDACTED INVESTIGATION CONTENT>"}
+                ]
+              }
+            expect_status: 200
+        expected_outcome: >
+          Completion returned successfully. Response body contains
+          choices[].message.content. No request content appears in
+          server-side logs (only token counts are stored). Privacy
+          security headers (X-Content-Type-Options, X-Frame-Options,
+          Strict-Transport-Security) are present on the response.
+    assertions:
+      succeeds:
+        - valid bearer token returns 200 with choices array
+        - response includes usage.prompt_tokens and usage.completion_tokens
+        - HSTS header present (Strict-Transport-Security: max-age=31536000)
+        - X-Content-Type-Options nosniff header present
+        - X-Frame-Options DENY header present
+      fails_gracefully:
+        - unauthenticated request returns 401 not 500
+        - expired or revoked key returns 401 not 500
+      output_not_contains:
+        - request content (choices field) in server logs
+        - caller identity or API key in response body
+        - PRIVATEMODE_API_KEY value in any response header or body
+
+  - id: advocacy-tool
+    name: Standard Advocacy Tool — Normal Inference
+    description: >
+      A campaign automation tool (e.g. n8n workflow or LangChain agent)
+      making routine inference requests — drafting outreach copy,
+      summarising campaign research, or generating embeddings for a
+      vector store. Uses a standard OpenAI-compatible client pointed at
+      the proxy base URL. No special privacy concerns beyond normal
+      operational security.
+    environment:
+      runtime: python@3.12
+      os: linux
+    flows:
+      - id: chat-completion-normal
+        name: Routine chat completion
+        steps:
+          - request: POST /v1/chat/completions
+            headers:
+              Authorization: "Bearer <valid-proxy-key>"
+              Content-Type: application/json
+            body: |
+              {
+                "model": "gemma-3-27b",
+                "messages": [
+                  {"role": "user", "content": "Write a one-paragraph summary of factory farming for a public campaign page."}
+                ]
+              }
+            expect_status: 200
+      - id: embeddings-request
+        name: Generate text embeddings for RAG pipeline
+        steps:
+          - request: POST /v1/embeddings
+            headers:
+              Authorization: "Bearer <valid-proxy-key>"
+              Content-Type: application/json
+            body: |
+              {
+                "model": "qwen3-embedding-4b",
+                "input": "factory farm welfare investigation report"
+              }
+            expect_status: 200
+      - id: list-models
+        name: Discover available models
+        steps:
+          - request: GET /v1/models
+            headers:
+              Authorization: "Bearer <valid-proxy-key>"
+            expect_status: 200
+        expected_outcome: >
+          JSON array listing at minimum gpt-oss-120b, gemma-3-27b,
+          qwen3-coder-30b-a3b, qwen3-embedding-4b, whisper-large-v3.
+    assertions:
+      succeeds:
+        - valid bearer token returns chat completion with choices array
+        - embeddings response includes data[].embedding float array
+        - models list response includes expected model IDs
+        - X-RateLimit-Remaining header present on proxied responses
+        - X-RateLimit-Limit header present on proxied responses
+      fails_gracefully:
+        - missing Authorization header returns 401 with descriptive error message
+        - X-API-Key header accepted as alternative to Bearer token
+      output_not_contains:
+        - caller identity in response headers
+        - upstream PRIVATEMODE_API_KEY in any response field
+
+  - id: privacy-auditor
+    name: Privacy Auditor — Log and Echo Verification
+    description: >
+      A caller whose sole purpose is verifying that the proxy does not
+      echo sensitive input back in any response field, does not expose
+      identifiers in headers, and does not log prompt content. Sends
+      a synthetic canary string as prompt content and checks that the
+      string never appears in response headers, error bodies, or any
+      observable side-channel.
+    environment:
+      runtime: python@3.12
+      os: linux
+    flows:
+      - id: canary-echo-check
+        name: Canary string must not be echoed in response metadata
+        steps:
+          - request: POST /v1/chat/completions
+            headers:
+              Authorization: "Bearer <valid-proxy-key>"
+              Content-Type: application/json
+            body: |
+              {
+                "model": "gpt-oss-120b",
+                "messages": [
+                  {"role": "user", "content": "SCOUT_CANARY_TOKEN_abc123xyz"}
+                ]
+              }
+            expect_status: 200
+        expected_outcome: >
+          Response headers contain no reference to the canary token.
+          The choices[].message.content may quote it back (model reply)
+          but the proxy adds no headers, log lines, or metadata that
+          repeat the raw request content.
+      - id: auth-error-safe-failure
+        name: Auth failure must not leak request body
+        steps:
+          - request: POST /v1/chat/completions
+            headers:
+              Authorization: "Bearer invalid-key-scout-test"
+              Content-Type: application/json
+            body: |
+              {
+                "model": "gpt-oss-120b",
+                "messages": [{"role": "user", "content": "CANARY_SENSITIVE_DATA"}]
+              }
+            expect_status: 401
+        expected_outcome: >
+          401 JSON error body contains only a generic error message.
+          CANARY_SENSITIVE_DATA does not appear in the response.
+    assertions:
+      succeeds:
+        - canary string absent from all response headers on success path
+        - 401 error body is a minimal JSON object with only an error key
+      fails_gracefully:
+        - invalid key returns 401 with message "Invalid or expired API key" not a stack trace
+        - missing key returns 401 with message about missing API key header
+      output_not_contains:
+        - request content in response headers
+        - request content in 401 or 429 error bodies
+        - caller IP address in response body
+        - Authorization header value reflected in any response field
+
+  - id: health-probe
+    name: Health / Readiness Probe
+    description: >
+      An infrastructure health check caller — load balancer, Kubernetes
+      readiness probe, or uptime monitor. Hits /health without
+      authentication and expects a fast JSON response. Used to verify
+      the container is up and the auth-proxy process is accepting
+      connections before routing live traffic.
+    environment:
+      runtime: docker
+      os: linux
+    flows:
+      - id: health-check
+        name: Unauthenticated health endpoint returns healthy
+        steps:
+          - request: GET /health
+            expect_status: 200
+        expected_outcome: >
+          JSON body {"status": "healthy"} returned within 2 seconds.
+          No Authorization header required. Security headers
+          (X-Content-Type-Options, X-Frame-Options) still present.
+      - id: health-check-no-leak
+        name: Health endpoint must not expose internal state
+        steps:
+          - request: GET /health
+            expect_status: 200
+        expected_outcome: >
+          Response body contains only the status field. Upstream URL,
+          Privatemode API key, TLS configuration, and rate-limit
+          counters are not disclosed.
+    assertions:
+      succeeds:
+        - GET /health without Authorization header returns 200
+        - response body is {"status": "healthy"}
+        - response time under 2000ms
+      fails_gracefully:
+        - proxy remains healthy under sustained request load (rate limiting returns 429 not 500)
+      output_not_contains:
+        - UPSTREAM_URL value in response body
+        - PRIVATEMODE_API_KEY in response body
+        - internal error stack traces in response body
