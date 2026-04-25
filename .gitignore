@@ -101,3 +101,7 @@ build/
 # State files are local only; config.json (suppressions) is tracked
 .desloppify/
 !.desloppify/config.json
+
+# Claude Code agent state — never commit
+.claude/agent-memory/
+.claude/worktrees/
