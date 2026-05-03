@@ -1,0 +1,5 @@
+# Documentation files that use placeholder identifiers as examples
+docs/
+# Lock files
+package-lock.json
+*.lock
