@@ -8,7 +8,7 @@ import time
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'auth-proxy'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "auth-proxy"))
 
 from usage_tracker import UsageTracker, get_time_range
 
@@ -65,8 +65,8 @@ class TestRecordUsage:
         )
 
         summary = tracker.get_usage_summary()
-        assert summary['total_tokens'] == 30
-        assert summary['requests'] == 1
+        assert summary["total_tokens"] == 30
+        assert summary["requests"] == 1
 
     def test_auto_calculates_total_tokens(self, tmp_path):
         usage_file = os.path.join(str(tmp_path), "usage.json")
@@ -82,38 +82,42 @@ class TestRecordUsage:
         )
 
         summary = tracker.get_usage_summary()
-        assert summary['total_tokens'] == 30
+        assert summary["total_tokens"] == 30
 
     def test_persistence(self, tmp_path):
         usage_file = os.path.join(str(tmp_path), "usage.json")
         tracker1 = UsageTracker(usage_file)
 
         # Record enough to trigger auto-save (every 10 records)
-        for i in range(10):
+        for _i in range(10):
             tracker1.record_usage(
-                key_id="key1", model="gpt-oss-120b", endpoint="chat",
+                key_id="key1",
+                model="gpt-oss-120b",
+                endpoint="chat",
                 total_tokens=100,
             )
 
         # Create a new tracker from the same file
         tracker2 = UsageTracker(usage_file)
         summary = tracker2.get_usage_summary()
-        assert summary['requests'] == 10
-        assert summary['total_tokens'] == 1000
+        assert summary["requests"] == 10
+        assert summary["total_tokens"] == 1000
 
     def test_flush(self, tmp_path):
         usage_file = os.path.join(str(tmp_path), "usage.json")
         tracker = UsageTracker(usage_file)
 
         tracker.record_usage(
-            key_id="key1", model="gpt-oss-120b", endpoint="chat",
+            key_id="key1",
+            model="gpt-oss-120b",
+            endpoint="chat",
             total_tokens=100,
         )
         tracker.flush()
 
         # Verify file exists and has data
         tracker2 = UsageTracker(usage_file)
-        assert tracker2.get_usage_summary()['requests'] == 1
+        assert tracker2.get_usage_summary()["requests"] == 1
 
 
 class TestUsageSummary:
@@ -127,8 +131,8 @@ class TestUsageSummary:
         tracker.record_usage(key_id="key2", model="gpt-oss-120b", endpoint="chat", total_tokens=200)
 
         summary = tracker.get_usage_summary(key_id="key1")
-        assert summary['total_tokens'] == 100
-        assert summary['requests'] == 1
+        assert summary["total_tokens"] == 100
+        assert summary["requests"] == 1
 
     def test_filter_by_time(self, tmp_path):
         usage_file = os.path.join(str(tmp_path), "usage.json")
@@ -140,7 +144,7 @@ class TestUsageSummary:
         # Filter to future time (should exclude current records)
         future = time.time() + 3600
         summary = tracker.get_usage_summary(start_time=future)
-        assert summary['requests'] == 0
+        assert summary["requests"] == 0
 
     def test_by_model_breakdown(self, tmp_path):
         usage_file = os.path.join(str(tmp_path), "usage.json")
@@ -150,10 +154,10 @@ class TestUsageSummary:
         tracker.record_usage(key_id="key1", model="gemma-3-27b", endpoint="chat", total_tokens=200)
 
         summary = tracker.get_usage_summary()
-        assert "gpt-oss-120b" in summary['by_model']
-        assert "gemma-3-27b" in summary['by_model']
-        assert summary['by_model']['gpt-oss-120b']['tokens'] == 100
-        assert summary['by_model']['gemma-3-27b']['tokens'] == 200
+        assert "gpt-oss-120b" in summary["by_model"]
+        assert "gemma-3-27b" in summary["by_model"]
+        assert summary["by_model"]["gpt-oss-120b"]["tokens"] == 100
+        assert summary["by_model"]["gemma-3-27b"]["tokens"] == 200
 
     def test_by_endpoint_breakdown(self, tmp_path):
         usage_file = os.path.join(str(tmp_path), "usage.json")
@@ -163,8 +167,8 @@ class TestUsageSummary:
         tracker.record_usage(key_id="key1", model="qwen3-embedding-4b", endpoint="embeddings", total_tokens=50)
 
         summary = tracker.get_usage_summary()
-        assert summary['by_endpoint']['chat']['requests'] == 1
-        assert summary['by_endpoint']['embeddings']['requests'] == 1
+        assert summary["by_endpoint"]["chat"]["requests"] == 1
+        assert summary["by_endpoint"]["embeddings"]["requests"] == 1
 
     def test_usage_by_key(self, tmp_path):
         usage_file = os.path.join(str(tmp_path), "usage.json")
@@ -175,9 +179,9 @@ class TestUsageSummary:
         tracker.record_usage(key_id="key2", model="gpt-oss-120b", endpoint="chat", total_tokens=50)
 
         by_key = tracker.get_usage_by_key()
-        assert by_key['key1']['tokens'] == 300
-        assert by_key['key1']['requests'] == 2
-        assert by_key['key2']['tokens'] == 50
+        assert by_key["key1"]["tokens"] == 300
+        assert by_key["key1"]["requests"] == 2
+        assert by_key["key2"]["tokens"] == 50
 
     def test_daily_breakdown(self, tmp_path):
         usage_file = os.path.join(str(tmp_path), "usage.json")
@@ -187,7 +191,7 @@ class TestUsageSummary:
 
         daily = tracker.get_daily_breakdown(days=1)
         assert len(daily) >= 1
-        assert daily[0]['tokens'] == 100
+        assert daily[0]["tokens"] == 100
 
 
 class TestTimeRanges:

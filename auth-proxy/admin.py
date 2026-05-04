@@ -11,24 +11,32 @@ Provides a simple web interface to:
 Protected by admin password.
 """
 
-import os
-import json
-import time
-import hashlib
-import secrets
 import base64
+import contextlib
+import hashlib
+import json
+import os
+import secrets
+import time
 from collections import defaultdict
-from html import escape
 from datetime import datetime
+from html import escape
 from pathlib import Path
+
 from aiohttp import web
 from cryptography.fernet import Fernet
-from usage_tracker import get_tracker, get_time_range
+
 from config import (
-    API_KEYS_FILE, SETTINGS_FILE, ADMIN_PASSWORD, PRIVATEMODE_API_KEY,
-    DEFAULT_RATE_LIMIT_REQUESTS, DEFAULT_RATE_LIMIT_WINDOW,
-    DEFAULT_IP_RATE_LIMIT_REQUESTS, DEFAULT_IP_RATE_LIMIT_WINDOW
+    ADMIN_PASSWORD,
+    API_KEYS_FILE,
+    DEFAULT_IP_RATE_LIMIT_REQUESTS,
+    DEFAULT_IP_RATE_LIMIT_WINDOW,
+    DEFAULT_RATE_LIMIT_REQUESTS,
+    DEFAULT_RATE_LIMIT_WINDOW,
+    PRIVATEMODE_API_KEY,
+    SETTINGS_FILE,
 )
+from usage_tracker import get_time_range, get_tracker
 from utils import get_client_ip
 
 # Aliases for backwards compatibility
@@ -62,9 +70,7 @@ def validate_session(token: str, ip: str) -> bool:
         del _sessions[token]
         return False
     # Validate IP matches the session's original IP
-    if ip != session_ip:
-        return False
-    return True
+    return ip == session_ip
 
 
 def delete_session(token: str) -> None:
@@ -83,10 +89,10 @@ def _cleanup_sessions() -> None:
 def get_default_settings() -> dict:
     """Return default settings with rate limits from config."""
     return {
-        'rate_limit_requests': DEFAULT_RATE_LIMIT_REQUESTS,
-        'rate_limit_window': DEFAULT_RATE_LIMIT_WINDOW,
-        'ip_rate_limit_requests': DEFAULT_IP_RATE_LIMIT_REQUESTS,
-        'ip_rate_limit_window': DEFAULT_IP_RATE_LIMIT_WINDOW,
+        "rate_limit_requests": DEFAULT_RATE_LIMIT_REQUESTS,
+        "rate_limit_window": DEFAULT_RATE_LIMIT_WINDOW,
+        "ip_rate_limit_requests": DEFAULT_IP_RATE_LIMIT_REQUESTS,
+        "ip_rate_limit_window": DEFAULT_IP_RATE_LIMIT_WINDOW,
     }
 
 
@@ -100,14 +106,14 @@ def load_settings() -> dict:
             saved = json.load(f)
         # Merge saved settings with defaults (saved takes precedence)
         return {**defaults, **saved}
-    except (json.JSONDecodeError, IOError):
+    except (OSError, json.JSONDecodeError):
         return defaults
 
 
 def save_settings(data: dict) -> None:
     """Save settings to file."""
     Path(SETTINGS_FILE).parent.mkdir(parents=True, exist_ok=True)
-    with open(SETTINGS_FILE, 'w') as f:
+    with open(SETTINGS_FILE, "w") as f:
         json.dump(data, f, indent=2)
 
 
@@ -115,10 +121,11 @@ def get_privatemode_key_status() -> tuple[str, str]:
     """Get status of Privatemode API key. Returns (status_text, css_class)."""
     if PRIVATEMODE_API_KEY:
         # Only show prefix to minimize exposure
-        if PRIVATEMODE_API_KEY.startswith('pm_'):
+        if PRIVATEMODE_API_KEY.startswith("pm_"):
             return "Configured (pm_****)", "status-active"
         return "Configured (****)", "status-active"
     return "Not configured", "status-revoked"
+
 
 # Temporary storage for newly generated keys (in-memory, short-lived)
 # Maps key_id -> (encrypted_key, timestamp)
@@ -130,7 +137,7 @@ _csrf_tokens: dict[str, float] = {}
 CSRF_TTL = 3600  # 1 hour
 
 
-PBKDF2_SALT = os.environ.get('PBKDF2_SALT', '').encode()
+PBKDF2_SALT = os.environ.get("PBKDF2_SALT", "").encode()
 if len(PBKDF2_SALT) < 16:
     raise ValueError("PBKDF2_SALT environment variable must be at least 16 bytes")
 
@@ -151,11 +158,11 @@ def _get_fernet_key() -> bytes:
         return _FERNET_KEY
     # Use PBKDF2 with 600,000 iterations (OWASP recommended for HMAC-SHA256)
     key_material = hashlib.pbkdf2_hmac(
-        'sha256',
+        "sha256",
         ADMIN_PASSWORD.encode(),
         PBKDF2_SALT,
         iterations=600_000,
-        dklen=32  # Fernet requires 32 bytes
+        dklen=32,  # Fernet requires 32 bytes
     )
     _FERNET_KEY = base64.urlsafe_b64encode(key_material)
     return _FERNET_KEY
@@ -234,7 +241,7 @@ def check_admin_auth(request: web.Request) -> bool:
     if not ADMIN_PASSWORD:
         return False
 
-    token = request.cookies.get('admin_session')
+    token = request.cookies.get("admin_session")
     if not token:
         return False
 
@@ -253,19 +260,19 @@ def load_keys() -> dict:
 def save_keys(data: dict) -> None:
     """Save keys to file."""
     Path(KEYS_FILE).parent.mkdir(parents=True, exist_ok=True)
-    with open(KEYS_FILE, 'w') as f:
+    with open(KEYS_FILE, "w") as f:
         json.dump(data, f, indent=2)
 
 
 def update_key_rate_limit(key_id: str, rate_limit: int | None) -> bool:
     """Update the rate limit for a specific key. Returns True if successful."""
     keys_data = load_keys()
-    for key in keys_data['keys']:
-        if key['key_id'] == key_id:
+    for key in keys_data["keys"]:
+        if key["key_id"] == key_id:
             if rate_limit is None:
-                key.pop('rate_limit', None)
+                key.pop("rate_limit", None)
             else:
-                key['rate_limit'] = rate_limit
+                key["rate_limit"] = rate_limit
             save_keys(keys_data)
             return True
     return False
@@ -280,9 +287,9 @@ def format_timestamp(ts: float | None) -> str:
 
 def get_key_status(key: dict) -> tuple[str, str]:
     """Get status and CSS class for a key."""
-    if not key.get('enabled', True):
+    if not key.get("enabled", True):
         return "Revoked", "status-revoked"
-    expires_at = key.get('expires_at')
+    expires_at = key.get("expires_at")
     if expires_at and time.time() > expires_at:
         return "Expired", "status-expired"
     return "Active", "status-active"
@@ -634,23 +641,18 @@ KEY_ROW = """
 async def admin_login_page(request: web.Request) -> web.Response:
     """Show login page."""
     if not ADMIN_PASSWORD:
-        return web.Response(
-            text="Admin UI disabled. Set ADMIN_PASSWORD environment variable to enable.",
-            status=403
-        )
+        return web.Response(text="Admin UI disabled. Set ADMIN_PASSWORD environment variable to enable.", status=403)
 
     if check_admin_auth(request):
-        raise web.HTTPFound('/admin')
+        raise web.HTTPFound("/admin")
 
-    error = request.query.get('error', '')
+    error = request.query.get("error", "")
     # Escape error message to prevent XSS attacks
-    error_html = f'<p class="error">{escape(error)}</p>' if error else ''
+    error_html = f'<p class="error">{escape(error)}</p>' if error else ""
 
     csrf_token = generate_csrf_token()
-    html = HTML_TEMPLATE.format(
-        content=LOGIN_CONTENT.format(error=error_html, csrf_token=csrf_token)
-    )
-    return web.Response(text=html, content_type='text/html')
+    html = HTML_TEMPLATE.format(content=LOGIN_CONTENT.format(error=error_html, csrf_token=csrf_token))
+    return web.Response(text=html, content_type="text/html")
 
 
 async def admin_login_post(request: web.Request) -> web.Response:
@@ -662,14 +664,11 @@ async def admin_login_post(request: web.Request) -> web.Response:
 
     # Check rate limit BEFORE password validation
     if not check_login_rate_limit(client_ip):
-        return web.Response(
-            text="Too many login attempts. Please try again later.",
-            status=429
-        )
+        return web.Response(text="Too many login attempts. Please try again later.", status=429)
 
     data = await request.post()
-    csrf_token = data.get('csrf_token', '')
-    password = data.get('password', '')
+    csrf_token = data.get("csrf_token", "")
+    password = data.get("password", "")
 
     # Validate CSRF token
     if not validate_csrf_token(csrf_token):
@@ -678,56 +677,53 @@ async def admin_login_post(request: web.Request) -> web.Response:
     if secrets.compare_digest(password, ADMIN_PASSWORD):
         # Create a new random session token
         token = create_session(client_ip)
-        response = web.HTTPFound('/admin')
+        response = web.HTTPFound("/admin")
         # Detect if running behind HTTPS (Fly.io, nginx, etc.)
-        is_https = request.headers.get('X-Forwarded-Proto', '').lower() == 'https'
+        is_https = request.headers.get("X-Forwarded-Proto", "").lower() == "https"
         response.set_cookie(
-            'admin_session',
+            "admin_session",
             token,
             max_age=86400,  # 24 hours
             httponly=True,
-            samesite='Strict',
-            secure=is_https  # Only send cookie over HTTPS in production
+            samesite="Strict",
+            secure=is_https,  # Only send cookie over HTTPS in production
         )
         return response
 
     # Record failed login attempt
     check_login_rate_limit(client_ip, record_attempt=True)
-    raise web.HTTPFound('/admin/login?error=Invalid password')
+    raise web.HTTPFound("/admin/login?error=Invalid password")
 
 
 async def admin_logout(request: web.Request) -> web.Response:
     """Handle logout."""
     # Delete the session from store
-    token = request.cookies.get('admin_session')
+    token = request.cookies.get("admin_session")
     if token:
         delete_session(token)
 
-    response = web.HTTPFound('/admin/login')
-    response.del_cookie('admin_session')
+    response = web.HTTPFound("/admin/login")
+    response.del_cookie("admin_session")
     return response
 
 
 async def admin_dashboard(request: web.Request) -> web.Response:
     """Show admin dashboard."""
     if not ADMIN_PASSWORD:
-        return web.Response(
-            text="Admin UI disabled. Set ADMIN_PASSWORD environment variable to enable.",
-            status=403
-        )
+        return web.Response(text="Admin UI disabled. Set ADMIN_PASSWORD environment variable to enable.", status=403)
 
     if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
+        raise web.HTTPFound("/admin/login")
 
     # Check for newly generated key to display (one-time retrieval)
-    new_key = ''
-    show_new_key = ''
-    show_key_id = request.query.get('show_key', '')
+    new_key = ""
+    show_new_key = ""
+    show_key_id = request.query.get("show_key", "")
     if show_key_id and show_key_id in _pending_keys:
         encrypted_key, timestamp = _pending_keys.pop(show_key_id)  # Remove after retrieval
         if time.time() - timestamp < PENDING_KEY_TTL:
             new_key = _decrypt_key_for_display(encrypted_key)
-            show_new_key = 'show'
+            show_new_key = "show"
 
     # Load keys
     data = load_keys()
@@ -736,30 +732,30 @@ async def admin_dashboard(request: web.Request) -> web.Response:
     csrf_token = generate_csrf_token()
 
     # Build keys table
-    if not data['keys']:
+    if not data["keys"]:
         keys_table = '<div class="empty-state">No API keys configured. Generate one above.</div>'
     else:
         rows = []
-        for key in data['keys']:
+        for key in data["keys"]:
             status, status_class = get_key_status(key)
 
-            if key.get('enabled', True):
+            if key.get("enabled", True):
                 actions = f'''
-                    <form method="POST" action="/admin/keys/{key['key_id']}/revoke" style="display:inline;">
+                    <form method="POST" action="/admin/keys/{key["key_id"]}/revoke" style="display:inline;">
                         <input type="hidden" name="csrf_token" value="{csrf_token}">
                         <button type="submit" class="btn-danger btn-small">Revoke</button>
                     </form>
                 '''
             else:
                 actions = f'''
-                    <form method="POST" action="/admin/keys/{key['key_id']}/enable" style="display:inline;">
+                    <form method="POST" action="/admin/keys/{key["key_id"]}/enable" style="display:inline;">
                         <input type="hidden" name="csrf_token" value="{csrf_token}">
                         <button type="submit" class="btn-secondary btn-small">Enable</button>
                     </form>
                 '''
 
             actions += f'''
-                <form method="POST" action="/admin/keys/{key['key_id']}/delete" style="display:inline;"
+                <form method="POST" action="/admin/keys/{key["key_id"]}/delete" style="display:inline;"
                       onsubmit="return confirm('Delete this key permanently?');">
                     <input type="hidden" name="csrf_token" value="{csrf_token}">
                     <button type="submit" class="btn-secondary btn-small">Delete</button>
@@ -767,10 +763,10 @@ async def admin_dashboard(request: web.Request) -> web.Response:
             '''
 
             # Format rate limit display with inline edit form
-            key_rate_limit = key.get('rate_limit')
+            key_rate_limit = key.get("rate_limit")
             if key_rate_limit:
                 rate_limit_display = f'''
-                    <form method="POST" action="/admin/keys/{key['key_id']}/rate-limit" style="display: flex; gap: 0.25rem; align-items: center;">
+                    <form method="POST" action="/admin/keys/{key["key_id"]}/rate-limit" style="display: flex; gap: 0.25rem; align-items: center;">
                         <input type="hidden" name="csrf_token" value="{csrf_token}">
                         <input type="number" name="rate_limit" value="{key_rate_limit}" style="width: 70px; padding: 0.25rem; font-size: 0.8rem; background: #0f172a; border: 1px solid #475569; border-radius: 4px; color: #e2e8f0;">
                         <button type="submit" class="btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Set</button>
@@ -779,58 +775,56 @@ async def admin_dashboard(request: web.Request) -> web.Response:
                 '''
             else:
                 rate_limit_display = f'''
-                    <form method="POST" action="/admin/keys/{key['key_id']}/rate-limit" style="display: flex; gap: 0.25rem; align-items: center;">
+                    <form method="POST" action="/admin/keys/{key["key_id"]}/rate-limit" style="display: flex; gap: 0.25rem; align-items: center;">
                         <input type="hidden" name="csrf_token" value="{csrf_token}">
                         <input type="number" name="rate_limit" placeholder="default" style="width: 70px; padding: 0.25rem; font-size: 0.8rem; background: #0f172a; border: 1px solid #475569; border-radius: 4px; color: #64748b;">
                         <button type="submit" class="btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Set</button>
                     </form>
                 '''
 
-            rows.append(KEY_ROW.format(
-                key_id=escape(key['key_id']),
-                description=escape(key.get('description', '-')),
-                status=status,
-                status_class=status_class,
-                rate_limit_display=rate_limit_display,
-                created=format_timestamp(key.get('created_at')),
-                expires=format_timestamp(key.get('expires_at')),
-                actions=actions
-            ))
+            rows.append(
+                KEY_ROW.format(
+                    key_id=escape(key["key_id"]),
+                    description=escape(key.get("description", "-")),
+                    status=status,
+                    status_class=status_class,
+                    rate_limit_display=rate_limit_display,
+                    created=format_timestamp(key.get("created_at")),
+                    expires=format_timestamp(key.get("expires_at")),
+                    actions=actions,
+                )
+            )
 
-        keys_table = KEYS_TABLE.format(rows=''.join(rows))
+        keys_table = KEYS_TABLE.format(rows="".join(rows))
 
     # Determine base URL for usage examples
-    scheme = request.headers.get('X-Forwarded-Proto', request.scheme)
-    host = request.headers.get('X-Forwarded-Host', request.host)
+    scheme = request.headers.get("X-Forwarded-Proto", request.scheme)
+    host = request.headers.get("X-Forwarded-Host", request.host)
     base_url = escape(f"{scheme}://{host}")
 
     content = DASHBOARD_CONTENT.format(
-        keys_table=keys_table,
-        new_key=new_key,
-        show_new_key=show_new_key,
-        base_url=base_url,
-        csrf_token=csrf_token
+        keys_table=keys_table, new_key=new_key, show_new_key=show_new_key, base_url=base_url, csrf_token=csrf_token
     )
 
     html = HTML_TEMPLATE.format(content=content)
-    return web.Response(text=html, content_type='text/html')
+    return web.Response(text=html, content_type="text/html")
 
 
 async def admin_generate_key(request: web.Request) -> web.Response:
     """Generate a new API key."""
     if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
+        raise web.HTTPFound("/admin/login")
 
     data = await request.post()
-    csrf_token = data.get('csrf_token', '')
+    csrf_token = data.get("csrf_token", "")
 
     # Validate CSRF token
     if not validate_csrf_token(csrf_token):
         return web.Response(text="Invalid or expired CSRF token", status=403)
 
-    description = data.get('description', '')
-    expires_days = data.get('expires_days', '')
-    rate_limit = data.get('rate_limit', '')
+    description = data.get("description", "")
+    expires_days = data.get("expires_days", "")
+    rate_limit = data.get("rate_limit", "")
 
     # Generate key
     new_key = f"pm_{secrets.token_urlsafe(32)}"
@@ -838,28 +832,24 @@ async def admin_generate_key(request: web.Request) -> web.Response:
     key_id = f"key_{secrets.token_hex(4)}"
 
     entry = {
-        'key_id': key_id,
-        'key_hash': key_hash,
-        'created_at': time.time(),
-        'description': description,
-        'enabled': True
+        "key_id": key_id,
+        "key_hash": key_hash,
+        "created_at": time.time(),
+        "description": description,
+        "enabled": True,
     }
 
     if expires_days:
-        try:
-            entry['expires_at'] = time.time() + (int(expires_days) * 86400)
-        except ValueError:
-            pass
+        with contextlib.suppress(ValueError):
+            entry["expires_at"] = time.time() + (int(expires_days) * 86400)
 
     if rate_limit:
-        try:
-            entry['rate_limit'] = int(rate_limit)
-        except ValueError:
-            pass
+        with contextlib.suppress(ValueError):
+            entry["rate_limit"] = int(rate_limit)
 
     # Save
     keys_data = load_keys()
-    keys_data['keys'].append(entry)
+    keys_data["keys"].append(entry)
     save_keys(keys_data)
 
     # Store encrypted key temporarily for one-time display
@@ -867,100 +857,100 @@ async def admin_generate_key(request: web.Request) -> web.Response:
     _pending_keys[key_id] = (_encrypt_key_for_display(new_key), time.time())
 
     # Redirect with just the key_id (not the actual key)
-    raise web.HTTPFound(f'/admin?show_key={key_id}')
+    raise web.HTTPFound(f"/admin?show_key={key_id}")
 
 
 async def admin_revoke_key(request: web.Request) -> web.Response:
     """Revoke an API key."""
     if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
+        raise web.HTTPFound("/admin/login")
 
     data = await request.post()
-    csrf_token = data.get('csrf_token', '')
+    csrf_token = data.get("csrf_token", "")
 
     # Validate CSRF token
     if not validate_csrf_token(csrf_token):
         return web.Response(text="Invalid or expired CSRF token", status=403)
 
-    key_id = request.match_info['key_id']
+    key_id = request.match_info["key_id"]
 
     keys_data = load_keys()
-    for key in keys_data['keys']:
-        if key['key_id'] == key_id:
-            key['enabled'] = False
-            key['revoked_at'] = time.time()
+    for key in keys_data["keys"]:
+        if key["key_id"] == key_id:
+            key["enabled"] = False
+            key["revoked_at"] = time.time()
             break
 
     save_keys(keys_data)
-    raise web.HTTPFound('/admin')
+    raise web.HTTPFound("/admin")
 
 
 async def admin_enable_key(request: web.Request) -> web.Response:
     """Re-enable an API key."""
     if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
+        raise web.HTTPFound("/admin/login")
 
     data = await request.post()
-    csrf_token = data.get('csrf_token', '')
+    csrf_token = data.get("csrf_token", "")
 
     # Validate CSRF token
     if not validate_csrf_token(csrf_token):
         return web.Response(text="Invalid or expired CSRF token", status=403)
 
-    key_id = request.match_info['key_id']
+    key_id = request.match_info["key_id"]
 
     keys_data = load_keys()
-    for key in keys_data['keys']:
-        if key['key_id'] == key_id:
-            key['enabled'] = True
-            if 'revoked_at' in key:
-                del key['revoked_at']
+    for key in keys_data["keys"]:
+        if key["key_id"] == key_id:
+            key["enabled"] = True
+            if "revoked_at" in key:
+                del key["revoked_at"]
             break
 
     save_keys(keys_data)
-    raise web.HTTPFound('/admin')
+    raise web.HTTPFound("/admin")
 
 
 async def admin_delete_key(request: web.Request) -> web.Response:
     """Delete an API key permanently."""
     if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
+        raise web.HTTPFound("/admin/login")
 
     data = await request.post()
-    csrf_token = data.get('csrf_token', '')
+    csrf_token = data.get("csrf_token", "")
 
     # Validate CSRF token
     if not validate_csrf_token(csrf_token):
         return web.Response(text="Invalid or expired CSRF token", status=403)
 
-    key_id = request.match_info['key_id']
+    key_id = request.match_info["key_id"]
 
     keys_data = load_keys()
-    keys_data['keys'] = [k for k in keys_data['keys'] if k['key_id'] != key_id]
+    keys_data["keys"] = [k for k in keys_data["keys"] if k["key_id"] != key_id]
     save_keys(keys_data)
 
-    raise web.HTTPFound('/admin')
+    raise web.HTTPFound("/admin")
 
 
 async def admin_update_key_rate_limit(request: web.Request) -> web.Response:
     """Update rate limit for a specific API key."""
     if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
+        raise web.HTTPFound("/admin/login")
 
     data = await request.post()
-    csrf_token = data.get('csrf_token', '')
+    csrf_token = data.get("csrf_token", "")
 
     # Validate CSRF token
     if not validate_csrf_token(csrf_token):
         return web.Response(text="Invalid or expired CSRF token", status=403)
 
-    key_id = request.match_info['key_id']
+    key_id = request.match_info["key_id"]
 
     # Check if clearing the rate limit
-    if data.get('clear'):
+    if data.get("clear"):
         update_key_rate_limit(key_id, None)
     else:
-        rate_limit_str = data.get('rate_limit', '')
+        rate_limit_str = data.get("rate_limit", "")
         if rate_limit_str:
             try:
                 rate_limit = int(rate_limit_str)
@@ -969,16 +959,16 @@ async def admin_update_key_rate_limit(request: web.Request) -> web.Response:
             except ValueError:
                 pass
 
-    raise web.HTTPFound('/admin')
+    raise web.HTTPFound("/admin")
 
 
 async def admin_save_rate_limits(request: web.Request) -> web.Response:
     """Save global rate limit settings."""
     if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
+        raise web.HTTPFound("/admin/login")
 
     data = await request.post()
-    csrf_token = data.get('csrf_token', '')
+    csrf_token = data.get("csrf_token", "")
 
     # Validate CSRF token
     if not validate_csrf_token(csrf_token):
@@ -989,20 +979,20 @@ async def admin_save_rate_limits(request: web.Request) -> web.Response:
 
     # Update rate limit settings
     try:
-        if data.get('rate_limit_requests'):
-            settings['rate_limit_requests'] = int(data['rate_limit_requests'])
-        if data.get('rate_limit_window'):
-            settings['rate_limit_window'] = int(data['rate_limit_window'])
-        if data.get('ip_rate_limit_requests'):
-            settings['ip_rate_limit_requests'] = int(data['ip_rate_limit_requests'])
-        if data.get('ip_rate_limit_window'):
-            settings['ip_rate_limit_window'] = int(data['ip_rate_limit_window'])
+        if data.get("rate_limit_requests"):
+            settings["rate_limit_requests"] = int(data["rate_limit_requests"])
+        if data.get("rate_limit_window"):
+            settings["rate_limit_window"] = int(data["rate_limit_window"])
+        if data.get("ip_rate_limit_requests"):
+            settings["ip_rate_limit_requests"] = int(data["ip_rate_limit_requests"])
+        if data.get("ip_rate_limit_window"):
+            settings["ip_rate_limit_window"] = int(data["ip_rate_limit_window"])
     except ValueError:
         pass
 
     save_settings(settings)
 
-    raise web.HTTPFound('/admin/settings?success=rate_limits')
+    raise web.HTTPFound("/admin/settings?success=rate_limits")
 
 
 USAGE_CONTENT = """
@@ -1186,18 +1176,15 @@ SETTINGS_CONTENT = """
 async def admin_settings(request: web.Request) -> web.Response:
     """Show settings page."""
     if not ADMIN_PASSWORD:
-        return web.Response(
-            text="Admin UI disabled. Set ADMIN_PASSWORD environment variable to enable.",
-            status=403
-        )
+        return web.Response(text="Admin UI disabled. Set ADMIN_PASSWORD environment variable to enable.", status=403)
 
     if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
+        raise web.HTTPFound("/admin/login")
 
     # Check for success message
-    success = request.query.get('success', '')
-    success_message = ''
-    if success == 'rate_limits':
+    success = request.query.get("success", "")
+    success_message = ""
+    if success == "rate_limits":
         success_message = '<div class="info-box" style="background: #022c22; border-color: #059669; color: #6ee7b7;">Rate limit settings saved successfully.</div>'
 
     # Get Privatemode key status
@@ -1206,10 +1193,10 @@ async def admin_settings(request: web.Request) -> web.Response:
     # Build message and dot color based on key status
     if PRIVATEMODE_API_KEY:
         pm_key_message = '<p style="color: #6ee7b7; font-size: 0.75rem;">E2E encryption active</p>'
-        pm_dot_color = '#22c55e'
+        pm_dot_color = "#22c55e"
     else:
         pm_key_message = '<p style="color: #f87171; font-size: 0.75rem;">Not configured - set PRIVATEMODE_API_KEY</p>'
-        pm_dot_color = '#ef4444'
+        pm_dot_color = "#ef4444"
 
     # Load current rate limit settings
     settings = load_settings()
@@ -1222,48 +1209,45 @@ async def admin_settings(request: web.Request) -> web.Response:
         pm_dot_color=pm_dot_color,
         csrf_token=csrf_token,
         success_message=success_message,
-        rate_limit_requests=settings.get('rate_limit_requests', 100),
-        rate_limit_window=settings.get('rate_limit_window', 60),
-        ip_rate_limit_requests=settings.get('ip_rate_limit_requests', 1000),
-        ip_rate_limit_window=settings.get('ip_rate_limit_window', 60),
+        rate_limit_requests=settings.get("rate_limit_requests", 100),
+        rate_limit_window=settings.get("rate_limit_window", 60),
+        ip_rate_limit_requests=settings.get("ip_rate_limit_requests", 1000),
+        ip_rate_limit_window=settings.get("ip_rate_limit_window", 60),
     )
 
     html = HTML_TEMPLATE.format(content=content)
-    return web.Response(text=html, content_type='text/html')
+    return web.Response(text=html, content_type="text/html")
 
 
 async def admin_usage(request: web.Request) -> web.Response:
     """Show usage dashboard."""
     if not ADMIN_PASSWORD:
-        return web.Response(
-            text="Admin UI disabled. Set ADMIN_PASSWORD environment variable to enable.",
-            status=403
-        )
+        return web.Response(text="Admin UI disabled. Set ADMIN_PASSWORD environment variable to enable.", status=403)
 
     if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
+        raise web.HTTPFound("/admin/login")
 
     # Get time period from query params
-    period = request.query.get('period', 'month')
+    period = request.query.get("period", "month")
     start_time, end_time = get_time_range(period)
 
     # Period labels and active states
     period_labels = {
-        'today': 'Today',
-        'week': 'Last 7 Days',
-        'month': 'Last 30 Days',
-        'year': 'Last Year',
-        'all': 'All Time'
+        "today": "Today",
+        "week": "Last 7 Days",
+        "month": "Last 30 Days",
+        "year": "Last Year",
+        "all": "All Time",
     }
-    period_label = period_labels.get(period, 'Last 30 Days')
+    period_label = period_labels.get(period, "Last 30 Days")
 
     # Active button states
     active_states = {
-        'active_today': 'btn-primary' if period == 'today' else '',
-        'active_week': 'btn-primary' if period == 'week' else '',
-        'active_month': 'btn-primary' if period == 'month' else '',
-        'active_year': 'btn-primary' if period == 'year' else '',
-        'active_all': 'btn-primary' if period == 'all' else ''
+        "active_today": "btn-primary" if period == "today" else "",
+        "active_week": "btn-primary" if period == "week" else "",
+        "active_month": "btn-primary" if period == "month" else "",
+        "active_year": "btn-primary" if period == "year" else "",
+        "active_all": "btn-primary" if period == "all" else "",
     }
 
     tracker = get_tracker()
@@ -1276,7 +1260,7 @@ async def admin_usage(request: web.Request) -> web.Response:
 
     # Load keys to get descriptions
     keys_data = load_keys()
-    key_descriptions = {k['key_id']: k.get('description', '-') for k in keys_data.get('keys', [])}
+    key_descriptions = {k["key_id"]: k.get("description", "-") for k in keys_data.get("keys", [])}
 
     # Build usage by key table
     if not usage_by_key:
@@ -1284,44 +1268,45 @@ async def admin_usage(request: web.Request) -> web.Response:
     else:
         rows = []
         # Sort by cost descending
-        sorted_keys = sorted(usage_by_key.items(), key=lambda x: x[1]['cost_eur'], reverse=True)
+        sorted_keys = sorted(usage_by_key.items(), key=lambda x: x[1]["cost_eur"], reverse=True)
         for key_id, data in sorted_keys:
-            rows.append(USAGE_BY_KEY_ROW.format(
-                description=escape(key_descriptions.get(key_id, 'Unknown Key')),
-                tokens=data['tokens'],
-                requests=data['requests'],
-                cost=data['cost_eur']
-            ))
-        usage_by_key_table = USAGE_BY_KEY_TABLE.format(rows=''.join(rows))
+            rows.append(
+                USAGE_BY_KEY_ROW.format(
+                    description=escape(key_descriptions.get(key_id, "Unknown Key")),
+                    tokens=data["tokens"],
+                    requests=data["requests"],
+                    cost=data["cost_eur"],
+                )
+            )
+        usage_by_key_table = USAGE_BY_KEY_TABLE.format(rows="".join(rows))
 
     # Build usage by model table
-    if not summary['by_model']:
+    if not summary["by_model"]:
         usage_by_model_table = '<div class="empty-state">No usage data for this period.</div>'
     else:
         rows = []
         # Sort by cost descending
-        sorted_models = sorted(summary['by_model'].items(), key=lambda x: x[1]['cost'], reverse=True)
+        sorted_models = sorted(summary["by_model"].items(), key=lambda x: x[1]["cost"], reverse=True)
         for model, data in sorted_models:
-            rows.append(USAGE_BY_MODEL_ROW.format(
-                model=escape(model),
-                tokens=data['tokens'],
-                requests=data['requests'],
-                cost=data['cost']
-            ))
-        usage_by_model_table = USAGE_BY_MODEL_TABLE.format(rows=''.join(rows))
+            rows.append(
+                USAGE_BY_MODEL_ROW.format(
+                    model=escape(model), tokens=data["tokens"], requests=data["requests"], cost=data["cost"]
+                )
+            )
+        usage_by_model_table = USAGE_BY_MODEL_TABLE.format(rows="".join(rows))
 
     content = USAGE_CONTENT.format(
         period_label=period_label,
-        total_cost=summary['total_cost_eur'],
-        total_tokens=summary['total_tokens'],
-        total_requests=summary['requests'],
+        total_cost=summary["total_cost_eur"],
+        total_tokens=summary["total_tokens"],
+        total_requests=summary["requests"],
         usage_by_key_table=usage_by_key_table,
         usage_by_model_table=usage_by_model_table,
-        **active_states
+        **active_states,
     )
 
     html = HTML_TEMPLATE.format(content=content)
-    return web.Response(text=html, content_type='text/html')
+    return web.Response(text=html, content_type="text/html")
 
 
 ABOUT_CONTENT = """
@@ -1502,28 +1487,25 @@ ABOUT_CONTENT = """
 async def admin_about(request: web.Request) -> web.Response:
     """Show about page."""
     if not ADMIN_PASSWORD:
-        return web.Response(
-            text="Admin UI disabled. Set ADMIN_PASSWORD environment variable to enable.",
-            status=403
-        )
+        return web.Response(text="Admin UI disabled. Set ADMIN_PASSWORD environment variable to enable.", status=403)
 
     if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
+        raise web.HTTPFound("/admin/login")
 
     html = HTML_TEMPLATE.format(content=ABOUT_CONTENT)
-    return web.Response(text=html, content_type='text/html')
+    return web.Response(text=html, content_type="text/html")
 
 
 async def admin_static(request: web.Request) -> web.Response:
     """Serve static files (logo, etc.)."""
-    filename = request.match_info.get('filename', '')
+    filename = request.match_info.get("filename", "")
 
     # Security: allowlist maps filenames to (relative path, content type).
     # The user-controlled value is only used as a dict key — the filesystem
     # path is constructed entirely from hardcoded values, breaking taint flow.
-    static_dir = Path(__file__).parent / 'static'
+    static_dir = Path(__file__).parent / "static"
     allowed_files = {
-        'logo.png': (static_dir / 'logo.png', 'image/png'),
+        "logo.png": (static_dir / "logo.png", "image/png"),
     }
 
     entry = allowed_files.get(filename)
@@ -1534,23 +1516,23 @@ async def admin_static(request: web.Request) -> web.Response:
     if not file_path.exists():
         raise web.HTTPNotFound()
 
-    with open(file_path, 'rb') as f:
+    with open(file_path, "rb") as f:
         return web.Response(body=f.read(), content_type=content_type)
 
 
 def setup_admin_routes(app: web.Application) -> None:
     """Add admin routes to the app."""
-    app.router.add_get('/admin', admin_dashboard)
-    app.router.add_get('/admin/settings', admin_settings)
-    app.router.add_post('/admin/settings/rate-limits', admin_save_rate_limits)
-    app.router.add_get('/admin/usage', admin_usage)
-    app.router.add_get('/admin/about', admin_about)
-    app.router.add_get('/admin/static/{filename}', admin_static)
-    app.router.add_get('/admin/login', admin_login_page)
-    app.router.add_post('/admin/login', admin_login_post)
-    app.router.add_get('/admin/logout', admin_logout)
-    app.router.add_post('/admin/keys/generate', admin_generate_key)
-    app.router.add_post('/admin/keys/{key_id}/revoke', admin_revoke_key)
-    app.router.add_post('/admin/keys/{key_id}/enable', admin_enable_key)
-    app.router.add_post('/admin/keys/{key_id}/delete', admin_delete_key)
-    app.router.add_post('/admin/keys/{key_id}/rate-limit', admin_update_key_rate_limit)
+    app.router.add_get("/admin", admin_dashboard)
+    app.router.add_get("/admin/settings", admin_settings)
+    app.router.add_post("/admin/settings/rate-limits", admin_save_rate_limits)
+    app.router.add_get("/admin/usage", admin_usage)
+    app.router.add_get("/admin/about", admin_about)
+    app.router.add_get("/admin/static/{filename}", admin_static)
+    app.router.add_get("/admin/login", admin_login_page)
+    app.router.add_post("/admin/login", admin_login_post)
+    app.router.add_get("/admin/logout", admin_logout)
+    app.router.add_post("/admin/keys/generate", admin_generate_key)
+    app.router.add_post("/admin/keys/{key_id}/revoke", admin_revoke_key)
+    app.router.add_post("/admin/keys/{key_id}/enable", admin_enable_key)
+    app.router.add_post("/admin/keys/{key_id}/delete", admin_delete_key)
+    app.router.add_post("/admin/keys/{key_id}/rate-limit", admin_update_key_rate_limit)

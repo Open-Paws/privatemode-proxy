@@ -45,7 +45,7 @@ def load_keys() -> dict:
 def save_keys(data: dict) -> None:
     """Save keys to file."""
     KEYS_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(KEYS_FILE, 'w') as f:
+    with open(KEYS_FILE, "w") as f:
         json.dump(data, f, indent=2)
     print(f"Keys saved to {KEYS_FILE}")
 
@@ -82,7 +82,7 @@ def cmd_generate(args):
         "key_hash": key_hash,
         "created_at": time.time(),
         "description": args.description or "",
-        "enabled": True
+        "enabled": True,
     }
 
     if args.expires_days:
@@ -193,7 +193,7 @@ def cmd_rotate(args):
         "created_at": time.time(),
         "description": old_key.get("description", "") + " (rotated)",
         "enabled": True,
-        "rotated_from": args.key_id
+        "rotated_from": args.key_id,
     }
 
     if args.expires_days:
@@ -242,7 +242,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Manage API keys for Privatemode proxy",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__
+        epilog=__doc__,
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 

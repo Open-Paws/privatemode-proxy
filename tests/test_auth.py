@@ -9,10 +9,13 @@ import time
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'auth-proxy'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "auth-proxy"))
 
 from tests.helpers import (
-    TEST_API_KEY, TEST_API_KEY_2, EXPIRED_API_KEY, DISABLED_API_KEY,
+    DISABLED_API_KEY,
+    EXPIRED_API_KEY,
+    TEST_API_KEY,
+    TEST_API_KEY_2,
     make_keys_file,
 )
 
@@ -21,54 +24,58 @@ class TestExtractApiKey:
     """Test API key extraction from request headers."""
 
     def test_bearer_token(self):
-        from server import extract_api_key
         from unittest.mock import MagicMock
 
+        from server import extract_api_key
+
         request = MagicMock()
-        request.headers = {'Authorization': f'Bearer {TEST_API_KEY}'}
+        request.headers = {"Authorization": f"Bearer {TEST_API_KEY}"}
         assert extract_api_key(request) == TEST_API_KEY
 
     def test_x_api_key_header(self):
-        from server import extract_api_key
         from unittest.mock import MagicMock
+
+        from server import extract_api_key
 
         request = MagicMock()
         request.headers = MagicMock()
-        request.headers.get = MagicMock(side_effect=lambda key, default='': (
-            '' if key == 'Authorization' else
-            TEST_API_KEY if key == 'X-API-Key' else default
-        ))
+        request.headers.get = MagicMock(
+            side_effect=lambda key, default="": (
+                "" if key == "Authorization" else TEST_API_KEY if key == "X-API-Key" else default
+            )
+        )
         assert extract_api_key(request) == TEST_API_KEY
 
     def test_missing_key(self):
-        from server import extract_api_key
         from unittest.mock import MagicMock
+
+        from server import extract_api_key
 
         request = MagicMock()
         request.headers = MagicMock()
-        request.headers.get = MagicMock(side_effect=lambda key, default='': '')
+        request.headers.get = MagicMock(side_effect=lambda key, default="": "")
         assert extract_api_key(request) is None
 
     def test_bearer_prefix_only(self):
-        from server import extract_api_key
         from unittest.mock import MagicMock
+
+        from server import extract_api_key
 
         request = MagicMock()
         request.headers = MagicMock()
-        request.headers.get = lambda key, default='': 'Bearer ' if key == 'Authorization' else None
+        request.headers.get = lambda key, default="": "Bearer " if key == "Authorization" else None
         # "Bearer " with empty key returns empty string
         result = extract_api_key(request)
-        assert result == ''
+        assert result == ""
 
     def test_non_bearer_auth_header(self):
-        from server import extract_api_key
         from unittest.mock import MagicMock
+
+        from server import extract_api_key
 
         request = MagicMock()
         request.headers = MagicMock()
-        request.headers.get = lambda key, default='': (
-            'Basic dXNlcjpwYXNz' if key == 'Authorization' else None
-        )
+        request.headers.get = lambda key, default="": "Basic dXNlcjpwYXNz" if key == "Authorization" else None
         # Basic auth should not be extracted as API key
         assert extract_api_key(request) is None
 
@@ -103,7 +110,7 @@ class TestKeyManager:
         keys_file = make_keys_file(tmp_path)
         km = KeyManager(keys_file)
 
-        valid, key_obj = km.validate_key(EXPIRED_API_KEY)
+        valid, _key_obj = km.validate_key(EXPIRED_API_KEY)
         assert valid is False
 
     def test_validate_disabled_key(self, tmp_path):
@@ -112,7 +119,7 @@ class TestKeyManager:
         keys_file = make_keys_file(tmp_path)
         km = KeyManager(keys_file)
 
-        valid, key_obj = km.validate_key(DISABLED_API_KEY)
+        valid, _key_obj = km.validate_key(DISABLED_API_KEY)
         assert valid is False
 
     def test_key_with_rate_limit(self, tmp_path):
@@ -133,9 +140,9 @@ class TestKeyManager:
 
         info = km.get_key_info(TEST_API_KEY)
         assert info is not None
-        assert info['key_id'] == "test_key_1"
-        assert info['description'] == "Test key 1"
-        assert 'key_hash' not in info  # Shouldn't leak the hash
+        assert info["key_id"] == "test_key_1"
+        assert info["description"] == "Test key 1"
+        assert "key_hash" not in info  # Shouldn't leak the hash
 
     def test_get_key_info_invalid(self, tmp_path):
         from key_manager import KeyManager
@@ -148,6 +155,7 @@ class TestKeyManager:
 
     def test_hot_reload(self, tmp_path):
         import json
+
         from key_manager import KeyManager
 
         keys_file = make_keys_file(tmp_path)
@@ -229,10 +237,10 @@ class TestKeyGeneration:
         from key_manager import create_key_entry
 
         entry = create_key_entry("pm_test", description="Test", store_hash_only=True)
-        assert 'key_hash' in entry
-        assert 'key' not in entry
-        assert entry['description'] == "Test"
-        assert entry['enabled'] is True
+        assert "key_hash" in entry
+        assert "key" not in entry
+        assert entry["description"] == "Test"
+        assert entry["enabled"] is True
 
     def test_create_key_entry_with_expiry(self):
         from key_manager import create_key_entry
@@ -240,5 +248,5 @@ class TestKeyGeneration:
         before = time.time()
         entry = create_key_entry("pm_test", expires_in_days=30)
         expected_expiry = before + (30 * 86400)
-        assert entry['expires_at'] >= expected_expiry - 1
-        assert entry['expires_at'] <= expected_expiry + 2
+        assert entry["expires_at"] >= expected_expiry - 1
+        assert entry["expires_at"] <= expected_expiry + 2

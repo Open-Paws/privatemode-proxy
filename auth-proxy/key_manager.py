@@ -9,24 +9,24 @@ Supports multiple valid keys with metadata including:
 - Description/owner info
 """
 
-import json
 import hashlib
-import secrets
-import time
-import threading
+import json
 import os
+import secrets
+import threading
+import time
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
 class APIKey:
     """Represents an API key with metadata."""
+
     key_id: str
     key_hash: str  # We store hash, not plaintext
     created_at: float
-    expires_at: Optional[float] = None
-    rate_limit: Optional[int] = None
+    expires_at: float | None = None
+    rate_limit: int | None = None
     description: str = ""
     enabled: bool = True
 
@@ -34,9 +34,7 @@ class APIKey:
         """Check if key is valid (enabled and not expired)."""
         if not self.enabled:
             return False
-        if self.expires_at and time.time() > self.expires_at:
-            return False
-        return True
+        return not (self.expires_at and time.time() > self.expires_at)
 
 
 class KeyManager:
@@ -56,12 +54,12 @@ class KeyManager:
     def _load_keys_from_env(self) -> None:
         """Load keys from environment variables (for cloud deployment)."""
         # API_KEYS env var: comma-separated list of keys
-        env_keys = os.environ.get('API_KEYS', '')
+        env_keys = os.environ.get("API_KEYS", "")
         if not env_keys:
             return
 
         with self._lock:
-            for i, key in enumerate(env_keys.split(',')):
+            for i, key in enumerate(env_keys.split(",")):
                 key = key.strip()
                 if not key:
                     continue
@@ -71,7 +69,7 @@ class KeyManager:
                     key_hash=key_hash,
                     created_at=time.time(),
                     description="From API_KEYS environment variable",
-                    enabled=True
+                    enabled=True,
                 )
                 self.keys[key_hash] = api_key
 
@@ -94,28 +92,28 @@ class KeyManager:
             if mtime <= self._last_modified:
                 return
 
-            with open(self.keys_file, 'r') as f:
+            with open(self.keys_file) as f:
                 data = json.load(f)
 
             with self._lock:
                 self.keys.clear()
-                for key_data in data.get('keys', []):
+                for key_data in data.get("keys", []):
                     # Support both hashed and plaintext keys in config
-                    if 'key_hash' in key_data:
-                        key_hash = key_data['key_hash']
-                    elif 'key' in key_data:
-                        key_hash = self._hash_key(key_data['key'])
+                    if "key_hash" in key_data:
+                        key_hash = key_data["key_hash"]
+                    elif "key" in key_data:
+                        key_hash = self._hash_key(key_data["key"])
                     else:
                         continue
 
                     api_key = APIKey(
-                        key_id=key_data.get('key_id', key_hash[:8]),
+                        key_id=key_data.get("key_id", key_hash[:8]),
                         key_hash=key_hash,
-                        created_at=key_data.get('created_at', time.time()),
-                        expires_at=key_data.get('expires_at'),
-                        rate_limit=key_data.get('rate_limit'),
-                        description=key_data.get('description', ''),
-                        enabled=key_data.get('enabled', True)
+                        created_at=key_data.get("created_at", time.time()),
+                        expires_at=key_data.get("expires_at"),
+                        rate_limit=key_data.get("rate_limit"),
+                        description=key_data.get("description", ""),
+                        enabled=key_data.get("enabled", True),
                     )
                     self.keys[key_hash] = api_key
 
@@ -135,7 +133,7 @@ class KeyManager:
         except Exception as e:
             print(f"Error checking keys file: {e}")
 
-    def validate_key(self, key: str) -> tuple[bool, Optional[APIKey]]:
+    def validate_key(self, key: str) -> tuple[bool, APIKey | None]:
         """
         Validate an API key.
         Returns (is_valid, api_key_obj or None).
@@ -149,17 +147,17 @@ class KeyManager:
                 return True, api_key
         return False, None
 
-    def get_key_info(self, key: str) -> Optional[dict]:
+    def get_key_info(self, key: str) -> dict | None:
         """Get non-sensitive info about a key."""
         valid, api_key = self.validate_key(key)
         if not valid or not api_key:
             return None
         return {
-            'key_id': api_key.key_id,
-            'created_at': api_key.created_at,
-            'expires_at': api_key.expires_at,
-            'rate_limit': api_key.rate_limit,
-            'description': api_key.description
+            "key_id": api_key.key_id,
+            "created_at": api_key.created_at,
+            "expires_at": api_key.expires_at,
+            "rate_limit": api_key.rate_limit,
+            "description": api_key.description,
         }
 
 
@@ -172,27 +170,27 @@ def generate_api_key(prefix: str = "pm") -> str:
 def create_key_entry(
     key: str,
     description: str = "",
-    expires_in_days: Optional[int] = None,
-    rate_limit: Optional[int] = None,
-    store_hash_only: bool = True
+    expires_in_days: int | None = None,
+    rate_limit: int | None = None,
+    store_hash_only: bool = True,
 ) -> dict:
     """Create a key entry for the keys file."""
     entry = {
-        'key_id': f"key_{secrets.token_hex(4)}",
-        'created_at': time.time(),
-        'description': description,
-        'enabled': True
+        "key_id": f"key_{secrets.token_hex(4)}",
+        "created_at": time.time(),
+        "description": description,
+        "enabled": True,
     }
 
     if store_hash_only:
-        entry['key_hash'] = hashlib.sha256(key.encode()).hexdigest()
+        entry["key_hash"] = hashlib.sha256(key.encode()).hexdigest()
     else:
-        entry['key'] = key
+        entry["key"] = key
 
     if expires_in_days:
-        entry['expires_at'] = time.time() + (expires_in_days * 86400)
+        entry["expires_at"] = time.time() + (expires_in_days * 86400)
 
     if rate_limit:
-        entry['rate_limit'] = rate_limit
+        entry["rate_limit"] = rate_limit
 
     return entry

@@ -1,0 +1,120 @@
+name: Test & Lint
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Python Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: |
+            auth-proxy/requirements.txt
+            requirements-test.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r auth-proxy/requirements.txt
+          pip install -r requirements-test.txt
+
+      - name: Run tests
+        working-directory: .
+        run: |
+          python -m pytest tests/ -v --tb=short
+
+  lint:
+    name: Ruff Lint & Format
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run ruff check
+        run: ruff check auth-proxy/ scripts/ tests/
+
+      - name: Run ruff format check
+        run: ruff format --check auth-proxy/ scripts/ tests/
+
+  typecheck:
+    name: Mypy Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: |
+            auth-proxy/requirements.txt
+            requirements-test.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r auth-proxy/requirements.txt
+          pip install -r requirements-test.txt
+          pip install mypy
+
+      - name: Run mypy
+        run: |
+          echo "Mypy is advisory — errors are reported but do not fail CI."
+          echo "Fix errors incrementally as you touch files."
+          mypy auth-proxy/ scripts/ --ignore-missing-imports --check-untyped-defs --no-strict-optional || true
+
+  docker:
+    name: Docker Build Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: privatemode-proxy:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Verify container starts
+        run: |
+          docker run --rm -d --name test-container \
+            -e API_KEYS_FILE=/app/secrets/keys.json \
+            -e UPSTREAM_URL=http://localhost:8081 \
+            -e PORT=8080 \
+            -e PRIVATEMODE_API_KEY=test-key \
+            -e FORCE_HTTPS=false \
+            privatemode-proxy:test
+          sleep 5
+          docker logs test-container
+          docker stop test-container

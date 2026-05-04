@@ -1,0 +1,41 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle errors
+    "F",     # pyflakes
+    "W",     # pycodestyle warnings
+    "I",     # isort
+    "UP",    # pyupgrade
+    "B",     # flake8-bugbear
+    "SIM",   # flake8-simplify
+    "RUF",   # ruff-specific rules
+]
+ignore = [
+    "B904",  # allow raise without from in some cases
+    "SIM108", # allow if-else blocks for readability
+    "RUF001", # allow unicode characters (e.g. × symbol in admin UI)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"auth-proxy/admin.py" = [
+    "E501", # HTML template strings are inherently long
+    "SIM103", # inline conditions would reduce readability in HTML templates
+    "SIM105", # contextlib.suppress less readable in HTML-heavy file
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["key_manager", "admin", "usage_tracker", "config", "utils"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+check_untyped_defs = true
+no_strict_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true

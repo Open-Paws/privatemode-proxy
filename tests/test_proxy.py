@@ -6,8 +6,7 @@ import json
 import os
 import sys
 
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'auth-proxy'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "auth-proxy"))
 
 from server import (
     detect_endpoint_type,
@@ -68,41 +67,37 @@ class TestExtractUsageFromResponse:
                 "prompt_tokens": 10,
                 "completion_tokens": 20,
                 "total_tokens": 30,
-            }
+            },
         }
         body = json.dumps(response).encode()
         usage = extract_usage_from_response(body, "chat")
 
-        assert usage['model'] == "gpt-oss-120b"
-        assert usage['prompt_tokens'] == 10
-        assert usage['completion_tokens'] == 20
-        assert usage['total_tokens'] == 30
+        assert usage["model"] == "gpt-oss-120b"
+        assert usage["prompt_tokens"] == 10
+        assert usage["completion_tokens"] == 20
+        assert usage["total_tokens"] == 30
 
     def test_embedding_response(self):
-        response = {
-            "model": "qwen3-embedding-4b",
-            "data": [{"embedding": [0.1, 0.2]}],
-            "usage": {"total_tokens": 50}
-        }
+        response = {"model": "qwen3-embedding-4b", "data": [{"embedding": [0.1, 0.2]}], "usage": {"total_tokens": 50}}
         body = json.dumps(response).encode()
         usage = extract_usage_from_response(body, "embeddings")
 
-        assert usage['model'] == "qwen3-embedding-4b"
-        assert usage['total_tokens'] == 50
+        assert usage["model"] == "qwen3-embedding-4b"
+        assert usage["total_tokens"] == 50
 
     def test_no_usage_field(self):
         response = {"model": "gpt-oss-120b", "choices": []}
         body = json.dumps(response).encode()
         usage = extract_usage_from_response(body, "chat")
 
-        assert usage['prompt_tokens'] == 0
-        assert usage['total_tokens'] == 0
+        assert usage["prompt_tokens"] == 0
+        assert usage["total_tokens"] == 0
 
     def test_invalid_response_body(self):
         usage = extract_usage_from_response(b"not json", "chat")
-        assert usage['model'] == 'unknown'
-        assert usage['total_tokens'] == 0
+        assert usage["model"] == "unknown"
+        assert usage["total_tokens"] == 0
 
     def test_empty_response(self):
         usage = extract_usage_from_response(b"", "chat")
-        assert usage['model'] == 'unknown'
+        assert usage["model"] == "unknown"

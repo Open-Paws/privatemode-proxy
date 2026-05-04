@@ -9,25 +9,25 @@ from unittest.mock import patch
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'auth-proxy'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "auth-proxy"))
 
 from admin import (
-    create_session,
-    validate_session,
-    delete_session,
+    _csrf_tokens,
+    _login_attempts,
     _sessions,
     check_login_rate_limit,
-    _login_attempts,
-    generate_csrf_token,
-    validate_csrf_token,
-    _csrf_tokens,
-    load_keys,
-    save_keys,
-    load_settings,
-    save_settings,
-    get_key_status,
+    create_session,
+    delete_session,
     format_timestamp,
+    generate_csrf_token,
+    get_key_status,
+    load_keys,
+    load_settings,
+    save_keys,
+    save_settings,
     update_key_rate_limit,
+    validate_csrf_token,
+    validate_session,
 )
 from tests.helpers import make_keys_file
 
@@ -145,48 +145,48 @@ class TestKeysCRUD:
 
     def test_load_keys(self, tmp_path):
         keys_file = make_keys_file(tmp_path)
-        with patch('admin.KEYS_FILE', keys_file):
+        with patch("admin.KEYS_FILE", keys_file):
             data = load_keys()
-            assert 'keys' in data
-            assert len(data['keys']) == 4
+            assert "keys" in data
+            assert len(data["keys"]) == 4
 
     def test_load_missing_file(self, tmp_path):
-        with patch('admin.KEYS_FILE', os.path.join(str(tmp_path), 'nope.json')):
+        with patch("admin.KEYS_FILE", os.path.join(str(tmp_path), "nope.json")):
             data = load_keys()
             assert data == {"keys": []}
 
     def test_save_and_reload(self, tmp_path):
-        keys_file = os.path.join(str(tmp_path), 'keys.json')
-        with patch('admin.KEYS_FILE', keys_file):
+        keys_file = os.path.join(str(tmp_path), "keys.json")
+        with patch("admin.KEYS_FILE", keys_file):
             save_keys({"keys": [{"key_id": "x", "enabled": True}]})
             data = load_keys()
-            assert len(data['keys']) == 1
-            assert data['keys'][0]['key_id'] == 'x'
+            assert len(data["keys"]) == 1
+            assert data["keys"][0]["key_id"] == "x"
 
     def test_update_key_rate_limit(self, tmp_path):
         keys_file = make_keys_file(tmp_path)
-        with patch('admin.KEYS_FILE', keys_file):
+        with patch("admin.KEYS_FILE", keys_file):
             result = update_key_rate_limit("test_key_1", 50)
             assert result is True
 
             # Verify it was saved
             data = load_keys()
-            key = next(k for k in data['keys'] if k['key_id'] == 'test_key_1')
-            assert key['rate_limit'] == 50
+            key = next(k for k in data["keys"] if k["key_id"] == "test_key_1")
+            assert key["rate_limit"] == 50
 
     def test_update_key_rate_limit_clear(self, tmp_path):
         keys_file = make_keys_file(tmp_path)
-        with patch('admin.KEYS_FILE', keys_file):
+        with patch("admin.KEYS_FILE", keys_file):
             # key_2 has rate_limit=5
             update_key_rate_limit("test_key_2", None)
 
             data = load_keys()
-            key = next(k for k in data['keys'] if k['key_id'] == 'test_key_2')
-            assert 'rate_limit' not in key
+            key = next(k for k in data["keys"] if k["key_id"] == "test_key_2")
+            assert "rate_limit" not in key
 
     def test_update_nonexistent_key(self, tmp_path):
         keys_file = make_keys_file(tmp_path)
-        with patch('admin.KEYS_FILE', keys_file):
+        with patch("admin.KEYS_FILE", keys_file):
             result = update_key_rate_limit("nonexistent", 10)
             assert result is False
 
@@ -195,39 +195,39 @@ class TestSettings:
     """Test settings load/save."""
 
     def test_load_defaults(self, tmp_path):
-        with patch('admin.SETTINGS_FILE', os.path.join(str(tmp_path), 'nope.json')):
+        with patch("admin.SETTINGS_FILE", os.path.join(str(tmp_path), "nope.json")):
             settings = load_settings()
-            assert 'rate_limit_requests' in settings
-            assert 'ip_rate_limit_requests' in settings
+            assert "rate_limit_requests" in settings
+            assert "ip_rate_limit_requests" in settings
 
     def test_save_and_load(self, tmp_path):
-        settings_file = os.path.join(str(tmp_path), 'settings.json')
-        with patch('admin.SETTINGS_FILE', settings_file):
-            save_settings({'rate_limit_requests': 200, 'custom': 'value'})
+        settings_file = os.path.join(str(tmp_path), "settings.json")
+        with patch("admin.SETTINGS_FILE", settings_file):
+            save_settings({"rate_limit_requests": 200, "custom": "value"})
             settings = load_settings()
-            assert settings['rate_limit_requests'] == 200
-            assert settings['custom'] == 'value'
+            assert settings["rate_limit_requests"] == 200
+            assert settings["custom"] == "value"
             # Defaults should still be present
-            assert 'ip_rate_limit_requests' in settings
+            assert "ip_rate_limit_requests" in settings
 
 
 class TestHelpers:
     """Test admin helper functions."""
 
     def test_get_key_status_active(self):
-        key = {'enabled': True}
+        key = {"enabled": True}
         status, css = get_key_status(key)
         assert status == "Active"
         assert css == "status-active"
 
     def test_get_key_status_revoked(self):
-        key = {'enabled': False}
+        key = {"enabled": False}
         status, css = get_key_status(key)
         assert status == "Revoked"
         assert css == "status-revoked"
 
     def test_get_key_status_expired(self):
-        key = {'enabled': True, 'expires_at': time.time() - 3600}
+        key = {"enabled": True, "expires_at": time.time() - 3600}
         status, css = get_key_status(key)
         assert status == "Expired"
         assert css == "status-expired"
