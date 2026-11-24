@@ -1,6 +1,6 @@
 # privatemode-proxy — Agent Reference
 
-OpenAI-compatible API proxy for [Privatemode](https://privatemode.ai) end-to-end encrypted AI, deployed on Azure Confidential VMs with AMD SEV-SNP hardware memory encryption. This is the **Tier 3 AI processing endpoint** for the Open Paws ecosystem — the mandatory route for investigation data, witness testimony, and legal defense materials that must never be processed by AI providers with data retention. All VM memory is hardware-encrypted; Azure cannot access decrypted traffic, TLS private keys, or the Privatemode API key. 116 tests. 5 models in production. Desloppify score 85.5/100.
+OpenAI-compatible API proxy for [Privatemode](https://privatemode.ai) end-to-end encrypted AI, deployed on Azure Confidential VMs with AMD SEV-SNP hardware memory encryption. This is the **Tier 3 AI processing endpoint** for the Open Paws ecosystem — the mandatory route for investigation data, witness testimony, and legal defense materials that must never be processed by AI providers with data retention. All VM memory is hardware-encrypted; Azure cannot access decrypted traffic, TLS private keys, or the Privatemode API key. 165 tests. 5 models in production. Desloppify score 85.5/100.
 
 ---
 
@@ -57,7 +57,7 @@ Client (HTTPS)
 
 The AMD SEV-SNP guarantee: TLS terminates inside hardware-encrypted memory. Azure's hypervisor cannot read decrypted traffic, TLS keys, or the Privatemode API key. This is enforced at the CPU level, not by software configuration.
 
-**Runtime dependencies** (auth-proxy): `aiohttp==3.13.5`, `aiohttp-cors==0.8.1`, `cryptography`
+**Runtime dependencies** (auth-proxy): `aiohttp==3.14.5`, `cryptography==50.0.2`, declared in `auth-proxy/requirements.in` and hash-locked in `auth-proxy/requirements.txt` (regenerate with `pip-compile --generate-hashes`)
 
 **Test stack**: `pytest`, `pytest-aiohttp`, `pytest-asyncio` (async mode)
 
@@ -80,7 +80,7 @@ curl http://localhost:8080/health
 
 ```bash
 pip install -r requirements-test.txt
-pytest                        # all 116 tests
+pytest                        # all 165 tests
 pytest tests/test_auth.py     # single module
 pytest -v                     # verbose
 ```
@@ -183,7 +183,7 @@ AMD SEV-SNP provides hardware attestation (verifiable proof the workload is runn
 
 ## Seven Concerns — Status for This Repo
 
-1. **Testing** — 116 tests, async aiohttp-based. Missing: mutation testing. Every new endpoint or auth behavior requires tests.
+1. **Testing** — 165 tests, async aiohttp-based. Missing: mutation testing. Every new endpoint or auth behavior requires tests.
 2. **Security** — AMD SEV-SNP + zero-retention + non-root container + TLS. This is the Tier 3 security boundary. Security changes require expert review.
 3. **Privacy** — Zero-retention is the core invariant. Never add logging of request content. Implemented and enforced in `usage_tracker.py`.
 4. **Cost optimization** — Per-key cost tracking in usage_tracker.py. Model routing optimization not yet implemented.
