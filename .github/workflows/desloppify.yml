@@ -7,6 +7,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Pinned desloppify commit (update deliberately; a branch can change under us)
+  DESLOPPIFY_REF: df39a7e478b5e0a131cc8377a0bb1c7286f0bbc5
+
 jobs:
   quality:
     name: Code Quality Gate (score >= 70)
@@ -15,25 +19,26 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: false
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.12'
 
       - name: Cache desloppify install
         id: cache-desloppify
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: /tmp/desloppify
-          key: desloppify-${{ runner.os }}-${{ hashFiles('.github/workflows/desloppify.yml') }}
+          key: desloppify-${{ runner.os }}-${{ env.DESLOPPIFY_REF }}
 
       - name: Clone desloppify
         if: steps.cache-desloppify.outputs.cache-hit != 'true'
         run: |
           git clone --no-recurse-submodules https://github.com/Open-Paws/desloppify.git /tmp/desloppify
+          git -C /tmp/desloppify checkout --detach "${DESLOPPIFY_REF}"
 
       - name: Install desloppify
         run: pip install "/tmp/desloppify[full]"

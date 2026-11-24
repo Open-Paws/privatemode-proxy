@@ -2,7 +2,7 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/)
 [![desloppify score](https://img.shields.io/badge/desloppify-87.6%2F100-brightgreen)](scorecard.png)
-[![Tests](https://img.shields.io/badge/tests-116%20passing-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/tests-165%20passing-brightgreen)](tests/)
 [![Open Paws](https://img.shields.io/badge/Open%20Paws-ecosystem-orange)](https://openpaws.ai)
 
 # privatemode-proxy
@@ -159,9 +159,10 @@ privatemode-proxy/
 │   ├── key_manager.py      # API key CRUD, validation, hot-reload from JSON
 │   ├── usage_tracker.py    # Token usage and cost tracking per key/model
 │   ├── utils.py            # Shared utilities
-│   ├── requirements.txt    # Runtime dependencies (aiohttp, aiohttp-cors, cryptography)
+│   ├── requirements.in     # Direct runtime dependencies (aiohttp, cryptography)
+│   ├── requirements.txt    # Hash-locked lock file generated from requirements.in
 │   └── static/             # Admin UI static assets
-├── tests/                  # 116 tests across auth, admin, endpoints, proxy, rate limiting
+├── tests/                  # 165 tests across auth, admin, endpoints, proxy, rate limiting, security regressions
 ├── scripts/
 │   ├── manage_keys.py      # CLI for API key management
 │   └── scrape_docs.py      # Scrapes Privatemode docs into docs/
@@ -184,6 +185,8 @@ Prompts and responses are never written to disk or any log stream. The proxy rea
 ```
 
 This is a core security invariant, not a configuration option. Any PR that adds logging of request or response content is a Tier 3 security incident.
+
+Usage metadata is minimised too: the proxy keeps only **daily totals** per key, model and endpoint (request count, tokens, audio bytes, cost), never one record per request, and deletes totals older than `USAGE_RETENTION_DAYS` (default 400). Admin security events (logins, key changes) are logged to stdout as JSON lines without client IP addresses.
 
 ### Defense-in-Depth Layers
 
@@ -211,24 +214,28 @@ This is a core security invariant, not a configuration option. Any PR that adds 
 |----------|----------|---------|-------------|
 | `PRIVATEMODE_API_KEY` | Yes | — | Your Privatemode API key |
 | `ADMIN_PASSWORD` | Yes | — | Password for admin web UI |
+| `PBKDF2_SALT` | Yes | — | Random salt, at least 16 characters (`openssl rand -base64 24`) |
 | `API_KEYS_FILE` | No | `/app/secrets/api_keys.json` | Path to API keys JSON |
 | `TLS_CERT_FILE` | No | — | Path to TLS certificate (enables HTTPS when set) |
 | `TLS_KEY_FILE` | No | — | Path to TLS private key |
 | `FORCE_HTTPS` | No | `true` when TLS enabled | Reject non-HTTPS requests |
-| `TRUST_PROXY` | No | `false` | Trust `X-Forwarded-*` headers from a reverse proxy |
-| `RATE_LIMIT_REQUESTS` | No | `100` | Global rate limit (requests per window) |
+| `TRUST_PROXY` | No | `false` | Trust `X-Forwarded-*` headers from a reverse proxy. Enable only if the app is never reachable directly |
+| `TRUSTED_PROXY_HOPS` | No | `1` | Number of trusted proxies; the client IP is read this many entries from the right of `X-Forwarded-For` |
+| `RATE_LIMIT_REQUESTS` | No | `100` | Global ceiling across all keys (requests per window) |
 | `RATE_LIMIT_WINDOW` | No | `60` | Rate limit window in seconds |
+| `KEY_RATE_LIMIT_REQUESTS` | No | `60` | Per-key limit for keys without their own limit |
 | `IP_RATE_LIMIT_REQUESTS` | No | `1000` | Per-IP rate limit |
 | `IP_RATE_LIMIT_WINDOW` | No | `60` | Per-IP rate limit window in seconds |
 | `PORT` | No | `8080` | Port to listen on |
-| `UPSTREAM_URL` | No | `http://localhost:8081` | URL for Privatemode binary |
+| `UPSTREAM_URL` | No | `http://127.0.0.1:8081` | URL for Privatemode binary (it listens on loopback only) |
+| `USAGE_RETENTION_DAYS` | No | `400` | Days to keep daily usage totals |
 
 ### Admin Panel
 
 Access at `https://yourdomain.com/admin` with your `ADMIN_PASSWORD`.
 
 - **API Keys** — generate keys with optional expiration and per-key rate limits, view status, revoke or delete instantly
-- **Settings** — verify Privatemode upstream connection, configure global and per-IP rate limits
+- **Settings** — verify Privatemode upstream connection, configure the global ceiling, default per-key and per-IP rate limits
 - **Usage & Costs** — total spend in Euros for any period, token usage by API key and model
 - **Documentation** — in-app reference for encryption model, code examples, model and pricing reference
 

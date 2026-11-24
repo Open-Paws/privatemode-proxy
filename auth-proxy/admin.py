@@ -21,15 +21,16 @@ from collections import defaultdict
 from html import escape
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import quote
 from aiohttp import web
 from cryptography.fernet import Fernet
 from usage_tracker import get_tracker, get_time_range
 from config import (
-    API_KEYS_FILE, SETTINGS_FILE, ADMIN_PASSWORD, PRIVATEMODE_API_KEY,
-    DEFAULT_RATE_LIMIT_REQUESTS, DEFAULT_RATE_LIMIT_WINDOW,
+    API_KEYS_FILE, SETTINGS_FILE, ADMIN_PASSWORD, PRIVATEMODE_API_KEY, TRUST_PROXY,
+    DEFAULT_RATE_LIMIT_REQUESTS, DEFAULT_RATE_LIMIT_WINDOW, DEFAULT_KEY_RATE_LIMIT_REQUESTS,
     DEFAULT_IP_RATE_LIMIT_REQUESTS, DEFAULT_IP_RATE_LIMIT_WINDOW
 )
-from utils import get_client_ip
+from utils import get_client_ip, cookies_must_be_secure
 
 # Aliases for backwards compatibility
 KEYS_FILE = API_KEYS_FILE
@@ -42,6 +43,27 @@ SESSION_TTL = 86400  # 24 hours
 _login_attempts: dict[str, list[float]] = defaultdict(list)
 LOGIN_RATE_LIMIT = 5  # max attempts
 LOGIN_RATE_WINDOW = 300  # 5 minute window
+_last_login_sweep = 0.0
+
+SESSION_COOKIE = 'admin_session'
+
+# Login error codes shown on the login page. Only these fixed messages can
+# appear there, so a crafted link cannot put arbitrary text on the official page.
+LOGIN_ERRORS = {
+    'invalid': 'Invalid password',
+    'expired': 'Your form expired. Please try again.',
+}
+
+
+def log_admin_event(event: str, **fields) -> None:
+    """
+    Write an admin security event to stdout as one JSON line.
+
+    Client IP addresses are deliberately not logged: who used the admin UI
+    from where is itself sensitive for this endpoint.
+    """
+    record = {'security_event': event, 'time': int(time.time()), **fields}
+    print(json.dumps(record, sort_keys=True), flush=True)
 
 
 def create_session(ip: str) -> str:
@@ -85,6 +107,7 @@ def get_default_settings() -> dict:
     return {
         'rate_limit_requests': DEFAULT_RATE_LIMIT_REQUESTS,
         'rate_limit_window': DEFAULT_RATE_LIMIT_WINDOW,
+        'key_rate_limit_requests': DEFAULT_KEY_RATE_LIMIT_REQUESTS,
         'ip_rate_limit_requests': DEFAULT_IP_RATE_LIMIT_REQUESTS,
         'ip_rate_limit_window': DEFAULT_IP_RATE_LIMIT_WINDOW,
     }
@@ -125,9 +148,12 @@ def get_privatemode_key_status() -> tuple[str, str]:
 _pending_keys: dict[str, tuple[str, float]] = {}
 PENDING_KEY_TTL = 60  # seconds
 
-# CSRF tokens: token -> created_at
-_csrf_tokens: dict[str, float] = {}
+# CSRF tokens: token -> (created_at, session token it is bound to, or None for
+# the anonymous login form). Insertion order equals creation order, so the
+# oldest tokens are always at the front.
+_csrf_tokens: dict[str, tuple[float, str | None]] = {}
 CSRF_TTL = 3600  # 1 hour
+MAX_CSRF_TOKENS = 10_000  # cap so anonymous page loads cannot exhaust memory
 
 
 PBKDF2_SALT = os.environ.get('PBKDF2_SALT', '').encode()
@@ -187,28 +213,45 @@ def _cleanup_pending_keys():
         del _pending_keys[k]
 
 
-def generate_csrf_token() -> str:
-    """Generate a new CSRF token."""
-    token = secrets.token_urlsafe(32)
-    _csrf_tokens[token] = time.time()
+def generate_csrf_token(session_token: str | None = None) -> str:
+    """Generate a new CSRF token bound to a session (None = the login form)."""
     _cleanup_csrf_tokens()
+    while len(_csrf_tokens) >= MAX_CSRF_TOKENS:
+        del _csrf_tokens[next(iter(_csrf_tokens))]
+    token = secrets.token_urlsafe(32)
+    _csrf_tokens[token] = (time.time(), session_token)
     return token
 
 
-def validate_csrf_token(token: str) -> bool:
-    """Validate and consume a CSRF token."""
+def validate_csrf_token(token: str, session_token: str | None = None) -> bool:
+    """Validate and consume a CSRF token; it must belong to the same session."""
     if not token or token not in _csrf_tokens:
         return False
-    created_at = _csrf_tokens.pop(token)
+    created_at, bound_session = _csrf_tokens.pop(token)
+    if bound_session != session_token:
+        return False
     return time.time() - created_at < CSRF_TTL
 
 
 def _cleanup_csrf_tokens() -> None:
-    """Remove expired CSRF tokens."""
+    """Remove expired CSRF tokens (they are all at the front of the dict)."""
     now = time.time()
-    expired = [t for t, created in _csrf_tokens.items() if now - created > CSRF_TTL]
-    for t in expired:
-        del _csrf_tokens[t]
+    while _csrf_tokens:
+        oldest = next(iter(_csrf_tokens))
+        if now - _csrf_tokens[oldest][0] <= CSRF_TTL:
+            break
+        del _csrf_tokens[oldest]
+
+
+def _sweep_login_attempts(window_start: float, now: float) -> None:
+    """Forget IPs with no recent failed logins, so the tracker cannot grow forever."""
+    global _last_login_sweep
+    if now - _last_login_sweep < LOGIN_RATE_WINDOW:
+        return
+    for ip in [ip for ip, stamps in _login_attempts.items()
+               if not stamps or stamps[-1] <= window_start]:
+        del _login_attempts[ip]
+    _last_login_sweep = now
 
 
 def check_login_rate_limit(ip: str, record_attempt: bool = False) -> bool:
@@ -220,6 +263,7 @@ def check_login_rate_limit(ip: str, record_attempt: bool = False) -> bool:
     """
     now = time.time()
     window_start = now - LOGIN_RATE_WINDOW
+    _sweep_login_attempts(window_start, now)
     # Clean old entries
     _login_attempts[ip] = [ts for ts in _login_attempts[ip] if ts > window_start]
     if len(_login_attempts[ip]) >= LOGIN_RATE_LIMIT:
@@ -234,12 +278,31 @@ def check_admin_auth(request: web.Request) -> bool:
     if not ADMIN_PASSWORD:
         return False
 
-    token = request.cookies.get('admin_session')
+    token = request.cookies.get(SESSION_COOKIE)
     if not token:
         return False
 
     ip = get_client_ip(request)
     return validate_session(token, ip)
+
+
+def session_token(request: web.Request) -> str | None:
+    """The admin session token sent with this request, if any."""
+    return request.cookies.get(SESSION_COOKIE)
+
+
+async def read_admin_form(request: web.Request):
+    """
+    Authenticate an admin POST and check its session-bound CSRF token.
+
+    Returns the parsed form data, or an HTTP response to send instead.
+    """
+    if not check_admin_auth(request):
+        raise web.HTTPFound('/admin/login')
+    data = await request.post()
+    if not validate_csrf_token(data.get('csrf_token', ''), session_token(request)):
+        return web.Response(text="Invalid or expired CSRF token", status=403)
+    return data
 
 
 def load_keys() -> dict:
@@ -413,8 +476,9 @@ HTML_TEMPLATE = """
         .success {{ color: #22c55e; margin-top: 0.5rem; }}
         .warning {{ color: #f59e0b; margin-top: 0.5rem; }}
         .header {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }}
-        .logout {{ color: #94a3b8; text-decoration: none; }}
+        .logout {{ color: #94a3b8; text-decoration: none; background: none; padding: 0; font-size: 1rem; }}
         .logout:hover {{ color: #e2e8f0; }}
+        .logout-form {{ display: inline; }}
 
         .nav {{ display: flex; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #334155; }}
         .nav a {{ color: #94a3b8; text-decoration: none; padding: 0.5rem 1rem; border-radius: 6px; }}
@@ -443,12 +507,7 @@ HTML_TEMPLATE = """
     <div class="container">
         {content}
     </div>
-    <script>
-        function copyKey(key) {{
-            navigator.clipboard.writeText(key);
-            alert('Key copied to clipboard!');
-        }}
-    </script>
+    <script src="/admin/static/admin.js"></script>
 </body>
 </html>
 """
@@ -482,7 +541,7 @@ DASHBOARD_CONTENT = """
         <img src="/admin/static/logo.png" alt="Open Paws">
         <div class="brand-text">Open <span>Paws</span> Privatemode AI Proxy</div>
     </div>
-    <a href="/admin/logout" class="logout">Logout</a>
+    <form method="POST" action="/admin/logout" class="logout-form"><input type="hidden" name="csrf_token" value="{csrf_token}"><button type="submit" class="logout">Logout</button></form>
 </div>
 
 <div class="nav">
@@ -523,7 +582,7 @@ DASHBOARD_CONTENT = """
         <strong style="color: #22c55e;">Key Generated</strong>
         <code>{new_key}</code>
         <p style="color: #94a3b8; font-size: 0.75rem; margin-top: 0.5rem;">Copy now - this won't be shown again</p>
-        <button onclick="copyKey('{new_key}')" class="btn-secondary btn-small" style="margin-top: 0.5rem;">Copy</button>
+        <button type="button" data-copy="{new_key}" class="btn-secondary btn-small" style="margin-top: 0.5rem;">Copy</button>
     </div>
 </div>
 
@@ -642,8 +701,8 @@ async def admin_login_page(request: web.Request) -> web.Response:
     if check_admin_auth(request):
         raise web.HTTPFound('/admin')
 
-    error = request.query.get('error', '')
-    # Escape error message to prevent XSS attacks
+    # Only fixed messages: the query value is a code, never displayed text
+    error = LOGIN_ERRORS.get(request.query.get('error', ''))
     error_html = f'<p class="error">{escape(error)}</p>' if error else ''
 
     csrf_token = generate_csrf_token()
@@ -662,6 +721,7 @@ async def admin_login_post(request: web.Request) -> web.Response:
 
     # Check rate limit BEFORE password validation
     if not check_login_rate_limit(client_ip):
+        log_admin_event('admin_login_rate_limited')
         return web.Response(
             text="Too many login attempts. Please try again later.",
             status=429
@@ -671,41 +731,47 @@ async def admin_login_post(request: web.Request) -> web.Response:
     csrf_token = data.get('csrf_token', '')
     password = data.get('password', '')
 
-    # Validate CSRF token
+    # Validate CSRF token. A bad token counts as a failed attempt, so the
+    # limiter also stops floods of forged or replayed login posts.
     if not validate_csrf_token(csrf_token):
-        return web.Response(text="Invalid or expired CSRF token", status=403)
+        check_login_rate_limit(client_ip, record_attempt=True)
+        raise web.HTTPFound('/admin/login?error=expired')
 
     if secrets.compare_digest(password, ADMIN_PASSWORD):
         # Create a new random session token
         token = create_session(client_ip)
+        log_admin_event('admin_login_success')
         response = web.HTTPFound('/admin')
-        # Detect if running behind HTTPS (Fly.io, nginx, etc.)
-        is_https = request.headers.get('X-Forwarded-Proto', '').lower() == 'https'
         response.set_cookie(
-            'admin_session',
+            SESSION_COOKIE,
             token,
             max_age=86400,  # 24 hours
+            path='/admin',
             httponly=True,
             samesite='Strict',
-            secure=is_https  # Only send cookie over HTTPS in production
+            # Secure whenever the deployment serves HTTPS, including when TLS
+            # terminates in this app (no X-Forwarded-Proto header then).
+            secure=cookies_must_be_secure(request)
         )
-        return response
+        raise response
 
     # Record failed login attempt
     check_login_rate_limit(client_ip, record_attempt=True)
-    raise web.HTTPFound('/admin/login?error=Invalid password')
+    log_admin_event('admin_login_failure')
+    raise web.HTTPFound('/admin/login?error=invalid')
 
 
 async def admin_logout(request: web.Request) -> web.Response:
-    """Handle logout."""
-    # Delete the session from store
-    token = request.cookies.get('admin_session')
-    if token:
-        delete_session(token)
+    """Handle logout (POST with a CSRF token, so other sites cannot trigger it)."""
+    data = await read_admin_form(request)
+    if isinstance(data, web.Response):
+        return data
 
+    delete_session(session_token(request))
+    log_admin_event('admin_logout')
     response = web.HTTPFound('/admin/login')
-    response.del_cookie('admin_session')
-    return response
+    response.del_cookie(SESSION_COOKIE, path='/admin')
+    raise response
 
 
 async def admin_dashboard(request: web.Request) -> web.Response:
@@ -732,8 +798,8 @@ async def admin_dashboard(request: web.Request) -> web.Response:
     # Load keys
     data = load_keys()
 
-    # Generate CSRF token for forms
-    csrf_token = generate_csrf_token()
+    # Generate CSRF token for forms (bound to this admin session)
+    csrf_token = generate_csrf_token(session_token(request))
 
     # Build keys table
     if not data['keys']:
@@ -742,25 +808,27 @@ async def admin_dashboard(request: web.Request) -> web.Response:
         rows = []
         for key in data['keys']:
             status, status_class = get_key_status(key)
+            # key_id goes into a URL path inside an HTML attribute
+            key_path = escape(quote(str(key['key_id']), safe=''))
 
             if key.get('enabled', True):
                 actions = f'''
-                    <form method="POST" action="/admin/keys/{key['key_id']}/revoke" style="display:inline;">
+                    <form method="POST" action="/admin/keys/{key_path}/revoke" style="display:inline;">
                         <input type="hidden" name="csrf_token" value="{csrf_token}">
                         <button type="submit" class="btn-danger btn-small">Revoke</button>
                     </form>
                 '''
             else:
                 actions = f'''
-                    <form method="POST" action="/admin/keys/{key['key_id']}/enable" style="display:inline;">
+                    <form method="POST" action="/admin/keys/{key_path}/enable" style="display:inline;">
                         <input type="hidden" name="csrf_token" value="{csrf_token}">
                         <button type="submit" class="btn-secondary btn-small">Enable</button>
                     </form>
                 '''
 
             actions += f'''
-                <form method="POST" action="/admin/keys/{key['key_id']}/delete" style="display:inline;"
-                      onsubmit="return confirm('Delete this key permanently?');">
+                <form method="POST" action="/admin/keys/{key_path}/delete" style="display:inline;"
+                      data-confirm="Delete this key permanently?">
                     <input type="hidden" name="csrf_token" value="{csrf_token}">
                     <button type="submit" class="btn-secondary btn-small">Delete</button>
                 </form>
@@ -770,16 +838,16 @@ async def admin_dashboard(request: web.Request) -> web.Response:
             key_rate_limit = key.get('rate_limit')
             if key_rate_limit:
                 rate_limit_display = f'''
-                    <form method="POST" action="/admin/keys/{key['key_id']}/rate-limit" style="display: flex; gap: 0.25rem; align-items: center;">
+                    <form method="POST" action="/admin/keys/{key_path}/rate-limit" style="display: flex; gap: 0.25rem; align-items: center;">
                         <input type="hidden" name="csrf_token" value="{csrf_token}">
                         <input type="number" name="rate_limit" value="{key_rate_limit}" style="width: 70px; padding: 0.25rem; font-size: 0.8rem; background: #0f172a; border: 1px solid #475569; border-radius: 4px; color: #e2e8f0;">
                         <button type="submit" class="btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Set</button>
-                        <button type="submit" name="clear" value="1" class="btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Use global default">×</button>
+                        <button type="submit" name="clear" value="1" class="btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Use the default per-key limit">×</button>
                     </form>
                 '''
             else:
                 rate_limit_display = f'''
-                    <form method="POST" action="/admin/keys/{key['key_id']}/rate-limit" style="display: flex; gap: 0.25rem; align-items: center;">
+                    <form method="POST" action="/admin/keys/{key_path}/rate-limit" style="display: flex; gap: 0.25rem; align-items: center;">
                         <input type="hidden" name="csrf_token" value="{csrf_token}">
                         <input type="number" name="rate_limit" placeholder="default" style="width: 70px; padding: 0.25rem; font-size: 0.8rem; background: #0f172a; border: 1px solid #475569; border-radius: 4px; color: #64748b;">
                         <button type="submit" class="btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Set</button>
@@ -800,13 +868,15 @@ async def admin_dashboard(request: web.Request) -> web.Response:
         keys_table = KEYS_TABLE.format(rows=''.join(rows))
 
     # Determine base URL for usage examples
-    scheme = request.headers.get('X-Forwarded-Proto', request.scheme)
-    host = request.headers.get('X-Forwarded-Host', request.host)
+    scheme, host = request.scheme, request.host
+    if TRUST_PROXY:
+        scheme = request.headers.get('X-Forwarded-Proto', scheme)
+        host = request.headers.get('X-Forwarded-Host', host)
     base_url = escape(f"{scheme}://{host}")
 
     content = DASHBOARD_CONTENT.format(
         keys_table=keys_table,
-        new_key=new_key,
+        new_key=escape(new_key),
         show_new_key=show_new_key,
         base_url=base_url,
         csrf_token=csrf_token
@@ -816,21 +886,24 @@ async def admin_dashboard(request: web.Request) -> web.Response:
     return web.Response(text=html, content_type='text/html')
 
 
+def positive_int(value) -> int | None:
+    """Parse a form value as a whole number greater than zero; None otherwise."""
+    try:
+        number = int(value)
+    except (TypeError, ValueError):
+        return None
+    return number if number > 0 else None
+
+
 async def admin_generate_key(request: web.Request) -> web.Response:
     """Generate a new API key."""
-    if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
-
-    data = await request.post()
-    csrf_token = data.get('csrf_token', '')
-
-    # Validate CSRF token
-    if not validate_csrf_token(csrf_token):
-        return web.Response(text="Invalid or expired CSRF token", status=403)
+    data = await read_admin_form(request)
+    if isinstance(data, web.Response):
+        return data
 
     description = data.get('description', '')
-    expires_days = data.get('expires_days', '')
-    rate_limit = data.get('rate_limit', '')
+    expires_days = positive_int(data.get('expires_days'))
+    rate_limit = positive_int(data.get('rate_limit'))
 
     # Generate key
     new_key = f"pm_{secrets.token_urlsafe(32)}"
@@ -846,21 +919,16 @@ async def admin_generate_key(request: web.Request) -> web.Response:
     }
 
     if expires_days:
-        try:
-            entry['expires_at'] = time.time() + (int(expires_days) * 86400)
-        except ValueError:
-            pass
+        entry['expires_at'] = time.time() + (expires_days * 86400)
 
     if rate_limit:
-        try:
-            entry['rate_limit'] = int(rate_limit)
-        except ValueError:
-            pass
+        entry['rate_limit'] = rate_limit
 
     # Save
     keys_data = load_keys()
     keys_data['keys'].append(entry)
     save_keys(keys_data)
+    log_admin_event('api_key_generated', key_id=key_id)
 
     # Store encrypted key temporarily for one-time display
     _cleanup_pending_keys()
@@ -872,15 +940,9 @@ async def admin_generate_key(request: web.Request) -> web.Response:
 
 async def admin_revoke_key(request: web.Request) -> web.Response:
     """Revoke an API key."""
-    if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
-
-    data = await request.post()
-    csrf_token = data.get('csrf_token', '')
-
-    # Validate CSRF token
-    if not validate_csrf_token(csrf_token):
-        return web.Response(text="Invalid or expired CSRF token", status=403)
+    data = await read_admin_form(request)
+    if isinstance(data, web.Response):
+        return data
 
     key_id = request.match_info['key_id']
 
@@ -892,20 +954,15 @@ async def admin_revoke_key(request: web.Request) -> web.Response:
             break
 
     save_keys(keys_data)
+    log_admin_event('api_key_revoked', key_id=key_id)
     raise web.HTTPFound('/admin')
 
 
 async def admin_enable_key(request: web.Request) -> web.Response:
     """Re-enable an API key."""
-    if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
-
-    data = await request.post()
-    csrf_token = data.get('csrf_token', '')
-
-    # Validate CSRF token
-    if not validate_csrf_token(csrf_token):
-        return web.Response(text="Invalid or expired CSRF token", status=403)
+    data = await read_admin_form(request)
+    if isinstance(data, web.Response):
+        return data
 
     key_id = request.match_info['key_id']
 
@@ -918,89 +975,71 @@ async def admin_enable_key(request: web.Request) -> web.Response:
             break
 
     save_keys(keys_data)
+    log_admin_event('api_key_enabled', key_id=key_id)
     raise web.HTTPFound('/admin')
 
 
 async def admin_delete_key(request: web.Request) -> web.Response:
     """Delete an API key permanently."""
-    if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
-
-    data = await request.post()
-    csrf_token = data.get('csrf_token', '')
-
-    # Validate CSRF token
-    if not validate_csrf_token(csrf_token):
-        return web.Response(text="Invalid or expired CSRF token", status=403)
+    data = await read_admin_form(request)
+    if isinstance(data, web.Response):
+        return data
 
     key_id = request.match_info['key_id']
 
     keys_data = load_keys()
     keys_data['keys'] = [k for k in keys_data['keys'] if k['key_id'] != key_id]
     save_keys(keys_data)
+    log_admin_event('api_key_deleted', key_id=key_id)
 
     raise web.HTTPFound('/admin')
 
 
 async def admin_update_key_rate_limit(request: web.Request) -> web.Response:
     """Update rate limit for a specific API key."""
-    if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
-
-    data = await request.post()
-    csrf_token = data.get('csrf_token', '')
-
-    # Validate CSRF token
-    if not validate_csrf_token(csrf_token):
-        return web.Response(text="Invalid or expired CSRF token", status=403)
+    data = await read_admin_form(request)
+    if isinstance(data, web.Response):
+        return data
 
     key_id = request.match_info['key_id']
 
     # Check if clearing the rate limit
     if data.get('clear'):
-        update_key_rate_limit(key_id, None)
+        if update_key_rate_limit(key_id, None):
+            log_admin_event('api_key_rate_limit_cleared', key_id=key_id)
     else:
-        rate_limit_str = data.get('rate_limit', '')
-        if rate_limit_str:
-            try:
-                rate_limit = int(rate_limit_str)
-                if rate_limit > 0:
-                    update_key_rate_limit(key_id, rate_limit)
-            except ValueError:
-                pass
+        rate_limit = positive_int(data.get('rate_limit'))
+        if rate_limit and update_key_rate_limit(key_id, rate_limit):
+            log_admin_event('api_key_rate_limit_set', key_id=key_id, rate_limit=rate_limit)
 
     raise web.HTTPFound('/admin')
 
 
+RATE_LIMIT_SETTING_FIELDS = (
+    'rate_limit_requests', 'rate_limit_window', 'key_rate_limit_requests',
+    'ip_rate_limit_requests', 'ip_rate_limit_window',
+)
+
+
 async def admin_save_rate_limits(request: web.Request) -> web.Response:
     """Save global rate limit settings."""
-    if not check_admin_auth(request):
-        raise web.HTTPFound('/admin/login')
-
-    data = await request.post()
-    csrf_token = data.get('csrf_token', '')
-
-    # Validate CSRF token
-    if not validate_csrf_token(csrf_token):
-        return web.Response(text="Invalid or expired CSRF token", status=403)
+    data = await read_admin_form(request)
+    if isinstance(data, web.Response):
+        return data
 
     # Load existing settings
     settings = load_settings()
 
-    # Update rate limit settings
-    try:
-        if data.get('rate_limit_requests'):
-            settings['rate_limit_requests'] = int(data['rate_limit_requests'])
-        if data.get('rate_limit_window'):
-            settings['rate_limit_window'] = int(data['rate_limit_window'])
-        if data.get('ip_rate_limit_requests'):
-            settings['ip_rate_limit_requests'] = int(data['ip_rate_limit_requests'])
-        if data.get('ip_rate_limit_window'):
-            settings['ip_rate_limit_window'] = int(data['ip_rate_limit_window'])
-    except ValueError:
-        pass
+    # Only whole numbers above zero are accepted; anything else keeps the old value
+    changed = {}
+    for field in RATE_LIMIT_SETTING_FIELDS:
+        value = positive_int(data.get(field))
+        if value is not None:
+            settings[field] = value
+            changed[field] = value
 
     save_settings(settings)
+    log_admin_event('rate_limit_settings_saved', **changed)
 
     raise web.HTTPFound('/admin/settings?success=rate_limits')
 
@@ -1011,7 +1050,7 @@ USAGE_CONTENT = """
         <img src="/admin/static/logo.png" alt="Open Paws">
         <div class="brand-text">Open <span>Paws</span> Privatemode AI Proxy</div>
     </div>
-    <a href="/admin/logout" class="logout">Logout</a>
+    <form method="POST" action="/admin/logout" class="logout-form"><input type="hidden" name="csrf_token" value="{csrf_token}"><button type="submit" class="logout">Logout</button></form>
 </div>
 
 <div class="nav">
@@ -1120,7 +1159,7 @@ SETTINGS_CONTENT = """
         <img src="/admin/static/logo.png" alt="Open Paws">
         <div class="brand-text">Open <span>Paws</span> Privatemode AI Proxy</div>
     </div>
-    <a href="/admin/logout" class="logout">Logout</a>
+    <form method="POST" action="/admin/logout" class="logout-form"><input type="hidden" name="csrf_token" value="{csrf_token}"><button type="submit" class="logout">Logout</button></form>
 </div>
 
 <div class="nav">
@@ -1148,8 +1187,9 @@ SETTINGS_CONTENT = """
 <div class="card">
     <h3 style="margin-bottom: 1rem;">Rate Limit Settings</h3>
     <p style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 1rem; line-height: 1.6;">
-        The global rate limit is shared across ALL API keys. When exceeded, no requests work until the window resets.
-        Per-key limits (set on individual keys below) provide additional restrictions for specific keys.
+        The global rate limit is a ceiling shared across ALL API keys. Each key is also limited on its own:
+        keys without a limit of their own get the default per-key limit, so one key cannot use up the shared ceiling.
+        Per-key limits set on the API Keys page override the default for that key.
     </p>
     <form method="POST" action="/admin/settings/rate-limits" style="display: grid; gap: 1rem;">
         <input type="hidden" name="csrf_token" value="{csrf_token}">
@@ -1161,6 +1201,12 @@ SETTINGS_CONTENT = """
             <div class="form-group">
                 <label>Rate Limit Window (seconds)</label>
                 <input type="number" name="rate_limit_window" value="{rate_limit_window}" min="1" placeholder="60">
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label>Default Per-Key Limit (requests per key per window)</label>
+                <input type="number" name="key_rate_limit_requests" value="{key_rate_limit_requests}" min="1" placeholder="60">
             </div>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -1213,7 +1259,7 @@ async def admin_settings(request: web.Request) -> web.Response:
 
     # Load current rate limit settings
     settings = load_settings()
-    csrf_token = generate_csrf_token()
+    csrf_token = generate_csrf_token(session_token(request))
 
     content = SETTINGS_CONTENT.format(
         pm_key_status=pm_key_status,
@@ -1224,6 +1270,7 @@ async def admin_settings(request: web.Request) -> web.Response:
         success_message=success_message,
         rate_limit_requests=settings.get('rate_limit_requests', 100),
         rate_limit_window=settings.get('rate_limit_window', 60),
+        key_rate_limit_requests=settings.get('key_rate_limit_requests', DEFAULT_KEY_RATE_LIMIT_REQUESTS),
         ip_rate_limit_requests=settings.get('ip_rate_limit_requests', 1000),
         ip_rate_limit_window=settings.get('ip_rate_limit_window', 60),
     )
@@ -1311,6 +1358,7 @@ async def admin_usage(request: web.Request) -> web.Response:
         usage_by_model_table = USAGE_BY_MODEL_TABLE.format(rows=''.join(rows))
 
     content = USAGE_CONTENT.format(
+        csrf_token=generate_csrf_token(session_token(request)),
         period_label=period_label,
         total_cost=summary['total_cost_eur'],
         total_tokens=summary['total_tokens'],
@@ -1330,7 +1378,7 @@ ABOUT_CONTENT = """
         <img src="/admin/static/logo.png" alt="Open Paws">
         <div class="brand-text">Open <span>Paws</span> Privatemode AI Proxy</div>
     </div>
-    <a href="/admin/logout" class="logout">Logout</a>
+    <form method="POST" action="/admin/logout" class="logout-form"><input type="hidden" name="csrf_token" value="{csrf_token}"><button type="submit" class="logout">Logout</button></form>
 </div>
 
 <div class="nav">
@@ -1510,7 +1558,8 @@ async def admin_about(request: web.Request) -> web.Response:
     if not check_admin_auth(request):
         raise web.HTTPFound('/admin/login')
 
-    html = HTML_TEMPLATE.format(content=ABOUT_CONTENT)
+    content = ABOUT_CONTENT.format(csrf_token=generate_csrf_token(session_token(request)))
+    html = HTML_TEMPLATE.format(content=content)
     return web.Response(text=html, content_type='text/html')
 
 
@@ -1524,6 +1573,7 @@ async def admin_static(request: web.Request) -> web.Response:
     static_dir = Path(__file__).parent / 'static'
     allowed_files = {
         'logo.png': (static_dir / 'logo.png', 'image/png'),
+        'admin.js': (static_dir / 'admin.js', 'text/javascript'),
     }
 
     entry = allowed_files.get(filename)
@@ -1538,19 +1588,30 @@ async def admin_static(request: web.Request) -> web.Response:
         return web.Response(body=f.read(), content_type=content_type)
 
 
+# Every admin route, and the handler that serves it. The auth middleware lets
+# exactly these handlers through without an API key (they check the admin
+# session themselves), so a route is either listed here or needs an API key.
+ADMIN_ROUTES = (
+    ('GET', '/admin', admin_dashboard),
+    ('GET', '/admin/settings', admin_settings),
+    ('POST', '/admin/settings/rate-limits', admin_save_rate_limits),
+    ('GET', '/admin/usage', admin_usage),
+    ('GET', '/admin/about', admin_about),
+    ('GET', '/admin/static/{filename}', admin_static),
+    ('GET', '/admin/login', admin_login_page),
+    ('POST', '/admin/login', admin_login_post),
+    ('POST', '/admin/logout', admin_logout),
+    ('POST', '/admin/keys/generate', admin_generate_key),
+    ('POST', '/admin/keys/{key_id}/revoke', admin_revoke_key),
+    ('POST', '/admin/keys/{key_id}/enable', admin_enable_key),
+    ('POST', '/admin/keys/{key_id}/delete', admin_delete_key),
+    ('POST', '/admin/keys/{key_id}/rate-limit', admin_update_key_rate_limit),
+)
+
+ADMIN_HANDLERS = frozenset(handler for _, _, handler in ADMIN_ROUTES)
+
+
 def setup_admin_routes(app: web.Application) -> None:
     """Add admin routes to the app."""
-    app.router.add_get('/admin', admin_dashboard)
-    app.router.add_get('/admin/settings', admin_settings)
-    app.router.add_post('/admin/settings/rate-limits', admin_save_rate_limits)
-    app.router.add_get('/admin/usage', admin_usage)
-    app.router.add_get('/admin/about', admin_about)
-    app.router.add_get('/admin/static/{filename}', admin_static)
-    app.router.add_get('/admin/login', admin_login_page)
-    app.router.add_post('/admin/login', admin_login_post)
-    app.router.add_get('/admin/logout', admin_logout)
-    app.router.add_post('/admin/keys/generate', admin_generate_key)
-    app.router.add_post('/admin/keys/{key_id}/revoke', admin_revoke_key)
-    app.router.add_post('/admin/keys/{key_id}/enable', admin_enable_key)
-    app.router.add_post('/admin/keys/{key_id}/delete', admin_delete_key)
-    app.router.add_post('/admin/keys/{key_id}/rate-limit', admin_update_key_rate_limit)
+    for method, path, handler in ADMIN_ROUTES:
+        app.router.add_route(method, path, handler)

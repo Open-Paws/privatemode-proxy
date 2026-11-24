@@ -136,8 +136,38 @@ class TestCSRFTokens:
     def test_expired_token(self):
         token = generate_csrf_token()
         # Manually expire it
-        _csrf_tokens[token] = time.time() - 7200  # 2 hours ago (TTL is 1 hour)
+        _csrf_tokens[token] = (time.time() - 7200, None)  # 2 hours ago (TTL is 1 hour)
         assert validate_csrf_token(token) is False
+
+    def test_token_bound_to_session(self):
+        # A token issued to one admin session is useless in any other session,
+        # including the anonymous login form.
+        token = generate_csrf_token('session-a')
+        assert validate_csrf_token(token, 'session-b') is False
+        token = generate_csrf_token('session-a')
+        assert validate_csrf_token(token, None) is False
+        token = generate_csrf_token('session-a')
+        assert validate_csrf_token(token, 'session-a') is True
+
+    def test_login_form_token_rejected_for_session(self):
+        token = generate_csrf_token()  # anonymous login-page token
+        assert validate_csrf_token(token, 'session-a') is False
+
+    def test_token_store_is_capped(self):
+        # Anonymous page loads must not grow memory without bound (audit F5)
+        import admin
+        with patch.object(admin, 'MAX_CSRF_TOKENS', 50):
+            tokens = [generate_csrf_token() for _ in range(200)]
+            assert len(_csrf_tokens) == 50
+            # The newest tokens survive, the oldest were evicted
+            assert validate_csrf_token(tokens[-1]) is True
+            assert validate_csrf_token(tokens[0]) is False
+
+    def test_expired_tokens_removed_on_generate(self):
+        old = generate_csrf_token()
+        _csrf_tokens[old] = (time.time() - 7200, None)
+        generate_csrf_token()
+        assert old not in _csrf_tokens
 
 
 class TestKeysCRUD:

@@ -2,7 +2,7 @@
 
 OpenAI-compatible API proxy that runs on Azure Confidential VMs (AMD SEV-SNP). Provides a web-accessible endpoint for end-to-end encrypted AI via [Privatemode](https://privatemode.ai) — no local software required. All memory is hardware-encrypted; Azure cannot access decrypted traffic, TLS keys, or API secrets.
 
-5 models live: `gpt-oss-120b`, `gemma-3-27b`, `qwen3-coder-30b`, `qwen3-embedding-4b`, `whisper-large-v3`. 116 tests. This is the Tier 3 AI processing endpoint for sensitive advocacy data — investigation documentation, witness testimony, and legal defense materials must route here, not through cloud APIs.
+5 models live: `gpt-oss-120b`, `gemma-3-27b`, `qwen3-coder-30b`, `qwen3-embedding-4b`, `whisper-large-v3`. 165 tests. This is the Tier 3 AI processing endpoint for sensitive advocacy data — investigation documentation, witness testimony, and legal defense materials must route here, not through cloud APIs.
 
 ## Quick Start
 
@@ -102,7 +102,7 @@ Tests use `pytest-aiohttp` for async HTTP testing. See `tests/conftest.py` for f
 
 ### Environment Variables
 
-See `.env.example` for the full list. Required: `ADMIN_PASSWORD`, `PRIVATEMODE_API_KEY`. Optional: `TLS_CERT_FILE`, `TLS_KEY_FILE`, `TRUST_PROXY`, rate limit settings.
+See `.env.example` for the full list. Required: `ADMIN_PASSWORD`, `PRIVATEMODE_API_KEY`, `PBKDF2_SALT`. Optional: `TLS_CERT_FILE`, `TLS_KEY_FILE`, `TRUST_PROXY`, `TRUSTED_PROXY_HOPS`, rate limit settings, `USAGE_RETENTION_DAYS`.
 
 ## Security Model
 
@@ -183,7 +183,7 @@ All 7 concerns apply. Highlighted critical ones:
 
 - **Security** (critical) — This is the Tier 3 security boundary. Any change to the proxy that weakens encryption, adds logging of request content, or exposes keys is a Tier 3 security incident. Every PR must pass the security audit checklist.
 - **Privacy** (critical) — Zero-retention is the core invariant. Never add logging that captures request content (`choices` field). Token usage metadata (the `usage` field) is the only permissible log.
-- **Testing** (critical) — 116 tests. Every new endpoint or behavior must have corresponding tests. Security-critical code requires higher test assertion quality.
+- **Testing** (critical) — 165 tests. Every new endpoint or behavior must have corresponding tests. Security-critical code requires higher test assertion quality.
 - **Cost optimization** — Usage tracker enables per-key cost attribution. Use this data to optimize model routing.
 - **Advocacy domain** — API key names and admin UI labels should use movement terminology.
 - **Accessibility** — Admin UI must work on low-bandwidth connections for field operatives.
