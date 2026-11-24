@@ -10,9 +10,12 @@ on:
       - '**/*.md'
       - '**/*.yaml'
       - '**/*.yml'
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: Open-Paws/no-animal-violence-action@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: Open-Paws/no-animal-violence-action@850b0200f0e62b08e60cea8d2bd17d25cffed601 # main as of 2026-11-05
