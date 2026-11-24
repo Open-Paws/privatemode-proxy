@@ -76,7 +76,9 @@ class KeyManager:
                 self.keys[key_hash] = api_key
 
             if self.keys:
-                print(f"Loaded {len(self.keys)} API keys from environment")
+                print(f"Loaded {len(self.keys)} API keys from environment. "
+                      "Note: API_KEYS holds plaintext keys; prefer hashed keys in "
+                      "the keys file (admin UI or scripts/manage_keys.py).")
 
     def _load_keys(self) -> None:
         """Load keys from file and/or environment."""
@@ -99,12 +101,14 @@ class KeyManager:
 
             with self._lock:
                 self.keys.clear()
+                plaintext_ids = []
                 for key_data in data.get('keys', []):
                     # Support both hashed and plaintext keys in config
                     if 'key_hash' in key_data:
                         key_hash = key_data['key_hash']
                     elif 'key' in key_data:
                         key_hash = self._hash_key(key_data['key'])
+                        plaintext_ids.append(key_data.get('key_id', key_hash[:8]))
                     else:
                         continue
 
@@ -121,6 +125,10 @@ class KeyManager:
 
                 self._last_modified = mtime
                 print(f"Loaded {len(self.keys)} API keys")
+                if plaintext_ids:
+                    print(f"Warning: {len(plaintext_ids)} key(s) stored in plaintext in "
+                          f"{self.keys_file} ({', '.join(plaintext_ids)}). Rotate them with "
+                          "scripts/manage_keys.py so only hashes are stored.")
 
         except Exception as e:
             print(f"Error loading keys: {e}")

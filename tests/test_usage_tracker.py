@@ -2,6 +2,7 @@
 Tests for usage tracking: cost calculation, record aggregation, time ranges.
 """
 
+import json
 import os
 import sys
 import time
@@ -88,12 +89,12 @@ class TestRecordUsage:
         usage_file = os.path.join(str(tmp_path), "usage.json")
         tracker1 = UsageTracker(usage_file)
 
-        # Record enough to trigger auto-save (every 10 records)
         for i in range(10):
             tracker1.record_usage(
                 key_id="key1", model="gpt-oss-120b", endpoint="chat",
                 total_tokens=100,
             )
+        tracker1.flush()
 
         # Create a new tracker from the same file
         tracker2 = UsageTracker(usage_file)
@@ -137,8 +138,8 @@ class TestUsageSummary:
         # Record usage
         tracker.record_usage(key_id="key1", model="gpt-oss-120b", endpoint="chat", total_tokens=100)
 
-        # Filter to future time (should exclude current records)
-        future = time.time() + 3600
+        # Totals are kept per UTC day, so "the future" means after today ends
+        future = time.time() + 2 * 86400
         summary = tracker.get_usage_summary(start_time=future)
         assert summary['requests'] == 0
 
@@ -216,3 +217,90 @@ class TestTimeRanges:
         start, end = get_time_range("unknown")
         assert start is None
         assert end is None
+
+
+class TestUsagePrivacyAndDurability:
+    """Usage is kept as daily totals with a retention limit (audit F6)."""
+
+    def test_requests_on_one_day_stored_as_one_row(self, tmp_path):
+        usage_file = os.path.join(str(tmp_path), "usage.json")
+        tracker = UsageTracker(usage_file)
+        for tokens in (100, 200, 300):
+            tracker.record_usage(key_id="key1", model="gpt-oss-120b", endpoint="chat",
+                                 total_tokens=tokens)
+        tracker.flush()
+
+        with open(usage_file) as f:
+            stored = json.load(f)
+        assert 'records' not in stored
+        assert len(stored['buckets']) == 1
+        row = stored['buckets'][0]
+        assert row['requests'] == 3
+        assert row['total_tokens'] == 600
+        # Only a date, never a time of day
+        assert set(row) == {'date', 'key_id', 'model', 'endpoint', 'requests',
+                            'prompt_tokens', 'completion_tokens', 'total_tokens',
+                            'audio_bytes', 'cost_eur'}
+
+    def test_legacy_per_request_file_is_migrated(self, tmp_path):
+        usage_file = os.path.join(str(tmp_path), "usage.json")
+        now = time.time()
+        legacy = {'records': [
+            {'timestamp': now, 'key_id': 'k', 'model': 'gpt-oss-120b', 'endpoint': 'chat',
+             'prompt_tokens': 1, 'completion_tokens': 2, 'total_tokens': 3,
+             'audio_bytes': 0, 'cost_eur': 0.1},
+            {'timestamp': now + 1, 'key_id': 'k', 'model': 'gpt-oss-120b', 'endpoint': 'chat',
+             'prompt_tokens': 1, 'completion_tokens': 2, 'total_tokens': 3,
+             'audio_bytes': 0, 'cost_eur': 0.1},
+        ]}
+        with open(usage_file, 'w') as f:
+            json.dump(legacy, f)
+
+        tracker = UsageTracker(usage_file)
+        assert tracker.get_usage_summary()['requests'] == 2
+        assert tracker.get_usage_summary()['total_tokens'] == 6
+        # The per-request timestamps are gone from disk after migration
+        with open(usage_file) as f:
+            stored = json.load(f)
+        assert 'records' not in stored
+        assert 'timestamp' not in json.dumps(stored)
+
+    def test_totals_older_than_retention_are_deleted(self, tmp_path):
+        usage_file = os.path.join(str(tmp_path), "usage.json")
+        with open(usage_file, 'w') as f:
+            json.dump({'buckets': [
+                {'date': '2000-01-01', 'key_id': 'k', 'model': 'm', 'endpoint': 'chat',
+                 'requests': 5, 'total_tokens': 50},
+            ]}, f)
+        tracker = UsageTracker(usage_file, retention_days=30)
+        tracker.record_usage(key_id="k", model="m", endpoint="chat", total_tokens=1)
+        tracker.flush()
+
+        assert tracker.get_usage_summary()['requests'] == 1
+        with open(usage_file) as f:
+            assert '2000-01-01' not in f.read()
+
+    def test_flush_is_atomic(self, tmp_path):
+        usage_file = os.path.join(str(tmp_path), "usage.json")
+        tracker = UsageTracker(usage_file)
+        tracker.record_usage(key_id="k", model="m", endpoint="chat", total_tokens=1)
+        tracker.flush()
+        assert sorted(os.listdir(tmp_path)) == ["usage.json"]  # no leftover temp file
+
+    def test_corrupt_file_is_kept_not_silently_discarded(self, tmp_path):
+        usage_file = os.path.join(str(tmp_path), "usage.json")
+        with open(usage_file, 'w') as f:
+            f.write('{"buckets": [ truncated')
+        tracker = UsageTracker(usage_file)
+        assert tracker.get_usage_summary()['requests'] == 0
+        backups = [n for n in os.listdir(tmp_path) if n.startswith("usage.json.corrupt-")]
+        assert len(backups) == 1
+
+    async def test_flush_async_writes_only_when_changed(self, tmp_path):
+        usage_file = os.path.join(str(tmp_path), "usage.json")
+        tracker = UsageTracker(usage_file)
+        await tracker.flush_async()
+        assert not os.path.exists(usage_file)  # nothing recorded, nothing written
+        tracker.record_usage(key_id="k", model="m", endpoint="chat", total_tokens=1)
+        await tracker.flush_async()
+        assert UsageTracker(usage_file).get_usage_summary()['requests'] == 1

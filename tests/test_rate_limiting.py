@@ -21,16 +21,21 @@ from server import (
 )
 
 
+def _clear_stores():
+    # Other test modules reload `server`, which replaces these module-level
+    # stores, so always clear the live ones rather than the names imported above.
+    live = sys.modules['server']
+    live.global_rate_limit_store.clear()
+    live.rate_limit_store.clear()
+    live.ip_rate_limit_store.clear()
+
+
 @pytest.fixture(autouse=True)
 def clear_rate_limit_stores():
     """Clear all rate limit stores before each test."""
-    global_rate_limit_store.clear()
-    rate_limit_store.clear()
-    ip_rate_limit_store.clear()
+    _clear_stores()
     yield
-    global_rate_limit_store.clear()
-    rate_limit_store.clear()
-    ip_rate_limit_store.clear()
+    _clear_stores()
 
 
 class TestGlobalRateLimit:
@@ -91,11 +96,37 @@ class TestGlobalRateLimit:
 class TestPerKeyRateLimit:
     """Test per-key rate limiting."""
 
-    def test_no_limit_set(self):
-        """Keys without a limit should always be allowed."""
-        allowed, remaining, limit = check_per_key_rate_limit("key1", None)
-        assert allowed is True
-        assert remaining == -1  # Indicates no limit
+    def test_no_limit_set_uses_default_per_key_limit(self):
+        """Keys without their own limit get the default per-key limit, so one
+        key cannot use up the shared global ceiling (audit hardening)."""
+        with patch('server.get_rate_limit_settings', return_value={
+            'rate_limit_requests': 100,
+            'rate_limit_window': 60,
+            'key_rate_limit_requests': 3,
+            'ip_rate_limit_requests': 1000,
+            'ip_rate_limit_window': 60,
+        }):
+            results = [check_per_key_rate_limit("key1", None) for _ in range(4)]
+            assert [allowed for allowed, _, _ in results] == [True, True, True, False]
+            assert results[0][2] == 3
+            # Another key is unaffected
+            assert check_per_key_rate_limit("key2", None)[0] is True
+
+    def test_idle_entries_are_swept(self):
+        """Per-IP entries for clients that went away are deleted, so spoofed or
+        rotating addresses cannot grow the store forever."""
+        live = sys.modules['server']
+        old = time.time() - 3600
+        for i in range(100):
+            live.ip_rate_limit_store[f"10.0.0.{i}"] = [old]
+        live._last_sweep['ip'] = 0.0
+        with patch('server.get_rate_limit_settings', return_value={
+            'rate_limit_requests': 100, 'rate_limit_window': 60,
+            'key_rate_limit_requests': 60,
+            'ip_rate_limit_requests': 1000, 'ip_rate_limit_window': 60,
+        }):
+            check_ip_rate_limit("203.0.113.9")
+        assert list(live.ip_rate_limit_store) == ["203.0.113.9"]
 
     def test_allows_within_limit(self):
         with patch('server.get_rate_limit_settings', return_value={
