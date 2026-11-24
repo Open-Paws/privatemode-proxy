@@ -1,11 +1,16 @@
 # Combined Dockerfile for Privatemode Auth Proxy
 # Runs both auth-proxy and privatemode-proxy in a single container
 
+# Base images are pinned by digest so every rebuild ships exactly what was
+# reviewed. The privatemode-proxy binary is the component that performs
+# attestation and E2E encryption, so bump it deliberately (Dependabot proposes
+# updates; check the release notes before merging).
+
 # Stage 1: Extract privatemode-proxy binary from official image
-FROM ghcr.io/edgelesssys/privatemode/privatemode-proxy:latest AS privatemode
+FROM ghcr.io/edgelesssys/privatemode/privatemode-proxy:v1.62.0@sha256:b2d564aa5f51dfc3cee60424108ca3de1ed0b5349d67e7eac7efe17e62d68d5b AS privatemode
 
 # Stage 2: Build final image
-FROM python:3.12-slim
+FROM python:3.12-slim@sha256:e695ab189fa2d082b1c61c69a6b888a5adeca61ceeccad107b1ed2a125721a9e
 
 WORKDIR /app
 
@@ -19,9 +24,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy privatemode-proxy binary from stage 1
 COPY --from=privatemode /bin/privatemode-proxy /usr/local/bin/privatemode-proxy
 
-# Install Python dependencies
+# Install Python dependencies (every package pinned and hash-checked)
 COPY auth-proxy/requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --require-hashes -r requirements.txt
 
 # Copy auth-proxy code
 COPY auth-proxy/ /app/auth-proxy/
